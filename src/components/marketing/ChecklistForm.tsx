@@ -7,6 +7,7 @@ type Status = "idle" | "sending" | "done" | "error";
 
 export default function ChecklistForm() {
   const [email, setEmail] = useState("");
+  const [website, setWebsite] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
 
@@ -28,7 +29,7 @@ export default function ChecklistForm() {
       const res = await fetch("/api/free-checklist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: trimmed }),
+        body: JSON.stringify({ email: trimmed, company_website: website }),
       });
       const data = await res.json().catch(() => null);
       if (res.ok && data && data.ok === true) {
@@ -104,6 +105,17 @@ export default function ChecklistForm() {
           placeholder="you@yourbusiness.com"
           autoComplete="email"
           className="w-full flex-1 rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#0f3d2e] focus:outline-none focus:ring-1 focus:ring-[#0f3d2e]"
+        />
+        {/* Honeypot: hidden from humans, catches bots. */}
+        <input
+          type="text"
+          name="company_website"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="hidden"
         />
         <button
           type="submit"

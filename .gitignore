@@ -5,4 +5,5 @@ out/
 .env*.local
 *.log
 .DS_Store
-drizzle/*.sql
+tsconfig.tsbuildinfo
+RAILWAY_VARIABLES.txt

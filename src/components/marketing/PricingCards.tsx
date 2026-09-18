@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { PAID_TIERS } from "@/lib/tiers";
+import { ACK_TEXT, ACK_VERSION } from "@/lib/ack";
 
 const PLAN_FEATURES: Record<string, string[]> = {
   starter: [
@@ -52,15 +53,20 @@ const PLAN_FEATURES: Record<string, string[]> = {
 export default function PricingCards() {
   const [pendingTier, setPendingTier] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [acknowledged, setAcknowledged] = useState(false);
 
   async function startCheckout(tier: string) {
+    if (!acknowledged) {
+      setError("Please check the acknowledgment box before continuing to payment.");
+      return;
+    }
     setPendingTier(tier);
     setError(null);
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier }),
+        body: JSON.stringify({ tier, acknowledged: true, ackVersion: ACK_VERSION }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data || typeof data.url !== "string") {
@@ -148,6 +154,22 @@ export default function PricingCards() {
           {error}
         </div>
       )}
+
+      <div className="mx-auto mt-8 max-w-2xl rounded-xl bg-amber-50 p-5 ring-1 ring-amber-200">
+        <label className="flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            checked={acknowledged}
+            onChange={(e) => setAcknowledged(e.target.checked)}
+            className="mt-1 h-5 w-5 shrink-0 accent-[#0f3d2e]"
+            aria-describedby="ack-text"
+          />
+          <span id="ack-text" className="text-sm leading-relaxed text-slate-700">
+            <strong className="text-slate-900">Before you pay, please confirm: </strong>
+            {ACK_TEXT}
+          </span>
+        </label>
+      </div>
 
       <p className="mt-6 text-center text-xs text-slate-500">
         Each purchase covers one company, LLC, or other legal entity. Plans do not renew

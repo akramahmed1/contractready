@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { count, eq } from "drizzle-orm";
-import { getDb } from "@/lib/db";
-import { bidKitRequests } from "@/db/schema";
 import { ensureUser, getActivePurchases, getUserTier } from "@/lib/access";
+import { getBidKitAllowance } from "@/lib/bidkits";
 import { PAID_TIERS, TIERS, tierUnlocks, type TierId } from "@/lib/tiers";
 import type { Lesson, TierOutline } from "@/content/types";
 
@@ -75,16 +73,15 @@ export default async function DashboardPage({
   const active = await getActivePurchases(userId);
   const expiry = active.find((p) => p.tier === tier)?.expiresAt ?? null;
 
-  let kitsUsed = 0;
+  let kitsRemaining = 0;
+  let kitsTotal = 0;
   try {
-    const db = getDb();
-    const [{ value }] = await db
-      .select({ value: count() })
-      .from(bidKitRequests)
-      .where(eq(bidKitRequests.userId, userId));
-    kitsUsed = value;
+    const allowance = await getBidKitAllowance(userId);
+    kitsRemaining = allowance.remaining;
+    kitsTotal = allowance.total;
   } catch {
-    kitsUsed = 0;
+    kitsRemaining = 0;
+    kitsTotal = 0;
   }
 
   const lessons = (await safeLessonsForTier(tier)).filter((l) => tierUnlocks(tier, l.tier));
@@ -133,18 +130,18 @@ export default async function DashboardPage({
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">Bid kits</p>
           <p className="mt-2 text-2xl font-bold text-slate-900">
-            {def.bidKits > 0 ? `${Math.max(0, def.bidKits - kitsUsed)} of ${def.bidKits} left` : "None on this plan"}
+            {kitsTotal > 0 ? `${kitsRemaining} of ${kitsTotal} left` : "None on this plan"}
           </p>
           <p className="mt-1 text-sm text-slate-600">
-            {def.bidKits > 0
+            {kitsTotal > 0
               ? "Request a done-for-you bid kit for a live solicitation."
               : "Bid kits come with the Bid Kit plan and above."}
           </p>
           <Link
-            href="/pricing"
+            href={kitsRemaining > 0 ? "/dashboard/bid-kits" : "/pricing"}
             className="mt-3 inline-block rounded-lg border border-emerald-900 px-4 py-2 text-sm font-semibold text-emerald-900"
           >
-            {def.bidKits > 0 ? "Request a bid kit" : "See plans with bid kits"}
+            {kitsRemaining > 0 ? "Request a bid kit" : "See plans with bid kits"}
           </Link>
         </div>
       </div>

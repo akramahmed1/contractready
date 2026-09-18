@@ -54,20 +54,20 @@ const tierTeasers = [
 
 const stats = [
   {
-    value: "$812B",
-    label: "Federal prime contract spend, FY2025",
+    value: "$793B",
+    label: "Federal contract spend, FY2025 (GAO)",
   },
   {
     value: "$183.5B",
-    label: "Awarded to small businesses, FY2024 (28.76% of prime spend)",
+    label: "Awarded to small businesses, FY2024 (SBA scorecard)",
   },
   {
-    value: "$91.1B",
-    label: "Small-business subcontracts, FY2025",
+    value: "$94B",
+    label: "Small-business subcontracts, FY2025 (approx., SBA scorecard)",
   },
   {
     value: "674,000+",
-    label: "Entities registered in SAM.gov",
+    label: "Entities registered in SAM.gov (GSA)",
   },
 ];
 

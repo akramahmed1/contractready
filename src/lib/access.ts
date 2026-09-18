@@ -4,17 +4,21 @@ import { purchases, users } from "@/db/schema";
 import { highestTier, type TierId } from "@/lib/tiers";
 
 export interface ActivePurchase {
+  id: number;
   tier: TierId;
+  purchasedAt: Date;
   expiresAt: Date;
   amountCents: number;
 }
 
-/** Non-refunded, non-expired purchases for a user, newest first. */
+/** Non-refunded, non-expired purchases for a user, earliest-expiring first. */
 export async function getActivePurchases(userId: string): Promise<ActivePurchase[]> {
   const db = getDb();
   const rows = await db
     .select({
+      id: purchases.id,
       tier: purchases.tier,
+      purchasedAt: purchases.purchasedAt,
       expiresAt: purchases.expiresAt,
       amountCents: purchases.amountCents,
     })
@@ -25,9 +29,12 @@ export async function getActivePurchases(userId: string): Promise<ActivePurchase
         eq(purchases.refunded, false),
         gt(purchases.expiresAt, new Date())
       )
-    );
+    )
+    .orderBy(purchases.expiresAt);
   return rows.map((r) => ({
+    id: r.id,
     tier: r.tier as TierId,
+    purchasedAt: r.purchasedAt,
     expiresAt: r.expiresAt,
     amountCents: r.amountCents,
   }));
