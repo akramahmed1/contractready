@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
+import { UserButton } from "@clerk/nextjs";
 
 const links = [
   { href: "/how-it-works", label: "How it works" },
@@ -7,7 +9,10 @@ const links = [
   { href: "/free-checklist", label: "Free checklist" },
 ];
 
-export default function Header() {
+export default async function Header() {
+  const { userId } = await auth();
+  const signedIn = Boolean(userId);
+
   return (
     <header className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
@@ -22,15 +27,26 @@ export default function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <Link href="/sign-in" className="text-sm font-medium text-slate-700 hover:text-[#0f3d2e]">
-            Sign in
-          </Link>
-          <Link
-            href="/pricing"
-            className="rounded-lg bg-[#0f3d2e] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0c3125]"
-          >
-            Get started
-          </Link>
+          {signedIn ? (
+            <>
+              <Link href="/dashboard" className="text-sm font-medium text-slate-700 hover:text-[#0f3d2e]">
+                Dashboard
+              </Link>
+              <UserButton afterSignOutUrl="/" />
+            </>
+          ) : (
+            <>
+              <Link href="/sign-in" className="text-sm font-medium text-slate-700 hover:text-[#0f3d2e]">
+                Sign in
+              </Link>
+              <Link
+                href="/pricing"
+                className="rounded-lg bg-[#0f3d2e] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0c3125]"
+              >
+                Get started
+              </Link>
+            </>
+          )}
         </div>
       </div>
       <div className="md:hidden border-t border-slate-100">
