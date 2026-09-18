@@ -55,7 +55,7 @@ export async function POST(req: Request) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as {
       id: string;
-      metadata?: { userId?: string; tier?: string; ackVersion?: string };
+      metadata?: { userId?: string; tier?: string; ackVersion?: string; ackAt?: string };
       amount_total?: number | null;
       payment_intent?: string | { id: string } | null;
     };
@@ -79,6 +79,18 @@ export async function POST(req: Request) {
           ? session.payment_intent
           : (session.payment_intent?.id ?? null);
 
+      // ackAt comes from the checkout session metadata (acknowledgment time),
+      // not from webhook receipt time. Fall back to now for sessions created
+      // before the metadata was added.
+      const ackAtRaw = session.metadata?.ackAt;
+      const ackAtParsed = ackAtRaw ? new Date(ackAtRaw) : null;
+      const ackAt =
+        session.metadata?.ackVersion && ackAtParsed && !Number.isNaN(ackAtParsed.getTime())
+          ? ackAtParsed
+          : session.metadata?.ackVersion
+            ? new Date()
+            : null;
+
       // FK to users: create the user row first, then the purchase.
       await db.insert(users).values({ id: userId }).onConflictDoNothing();
       await db
@@ -91,7 +103,7 @@ export async function POST(req: Request) {
           amountCents: session.amount_total ?? TIERS[tier as TierId].priceCents,
           expiresAt,
           refunded: false,
-          ackAt: session.metadata?.ackVersion ? new Date() : null,
+          ackAt,
           ackVersion: session.metadata?.ackVersion ?? null,
         })
         .onConflictDoNothing();

@@ -40,6 +40,10 @@ export async function POST(req: Request) {
     }
 
     const stripe = getStripe();
+    // The buyer acknowledged the terms right now, at checkout creation.
+    // The timestamp rides along in the session metadata so the webhook can
+    // persist exactly when the acknowledgment happened.
+    const ackAtIso = new Date().toISOString();
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [
@@ -55,7 +59,7 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      metadata: { userId, tier, ackVersion: ACK_VERSION },
+      metadata: { userId, tier, ackVersion: ACK_VERSION, ackAt: ackAtIso },
       success_url: `${APP_URL}/dashboard?purchase=success`,
       cancel_url: `${APP_URL}/pricing`,
     });
