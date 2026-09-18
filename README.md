@@ -35,7 +35,7 @@ npm run dev          # http://localhost:3000
 
 1. Create a Railway project from this repo.
 2. Add all variables from `ENV_TEMPLATE.md`.
-3. Set the Stripe webhook endpoint to `https://<your-domain>/api/webhooks/stripe`.
+3. Set the Stripe webhook endpoint to `https://getcontractready.com/api/webhooks/stripe` once the domain is live (use the Railway URL until then).
 
 ## Legal status
 

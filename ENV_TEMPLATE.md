@@ -18,7 +18,7 @@ cp .env.example .env
 | `STRIPE_SECRET_KEY` | Stripe dashboard (toggle **Test mode**) > Developers > API keys > Secret key (`sk_test_...`) | Yes for checkout |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Same page > Publishable key (`pk_test_...`) | Yes for checkout |
 | `STRIPE_WEBHOOK_SECRET` | Stripe dashboard > Developers > Webhooks > add endpoint `https://YOUR-DOMAIN/api/webhooks/stripe` > Signing secret (`whsec_...`). For local dev, use the Stripe CLI: `stripe listen --forward-to localhost:3000/api/webhooks/stripe` | Yes for provisioning |
-| `NEXT_PUBLIC_APP_URL` | Your deployed URL, e.g. `https://contractready.up.railway.app` | Yes on deploy |
+| `NEXT_PUBLIC_APP_URL` | Planned production domain: `https://getcontractready.com` (not registered yet — use the Railway-provided URL until it is) | Yes on deploy |
 
 ## 3. Going live later
 
@@ -27,7 +27,7 @@ When you are ready to take real payments:
 1. In Stripe, toggle off Test mode and paste the **live** keys (`sk_live_...`, `pk_live_...`) over the test keys.
 2. Create a **live** webhook endpoint and paste the new `STRIPE_WEBHOOK_SECRET`.
 3. Have an attorney review the legal pages (`/legal/terms`, `/legal/privacy`, `/legal/refunds`) and remove the draft banners.
-4. Set `NEXT_PUBLIC_APP_URL` to the production domain.
+4. Set `NEXT_PUBLIC_APP_URL` to `https://getcontractready.com` once the domain is registered; until then, use the Railway-provided URL.
 
 ## 4. What is stubbed without keys
 
