@@ -139,3 +139,47 @@ or framed as general advice rather than procedural fact.
 - Set-aside program rules before writing the Growth/Pro certification lessons.
 - apexaccelerators.us and sba.gov URLs in the free lesson and PDF.
 - SAM.gov screen flow before any click-level walkthrough is published.
+
+## 5. Full curriculum build (September 18, 2026): Bid Kit, Growth, Annual Pro, All Access
+
+The four paid tiers above Starter were given complete written lesson
+curricula (previously scaffolded outlines only). Source files:
+`src/content/bidkit.ts`, `src/content/growth.ts`, `src/content/pro.ts`,
+`src/content/allaccess.ts`. Each lesson was written against the research
+report (`/home/hatch/workspace/research_notes/sam-gov-mechanics-20260918/report.md`)
+as the source of truth, with the hedging rules in sections 1-4 above.
+
+New items and how they were handled:
+
+- Opportunity matching page (`/dashboard/opportunities`): the SAM.gov search
+  URL pattern (`https://sam.gov/search/?index=opp` with active-status and
+  keyword-tag filters) was verified against live SAM.gov search result URLs
+  found via web search on September 18, 2026. The page links out to SAM.gov;
+  it does not scrape SAM.gov or claim to. Customers run searches in their own
+  browser and save them to their own SAM.gov account for email alerts.
+- SBA SUBNet link: links to https://www.sba.gov/ with instructions to search
+  for SUBNet, rather than guessing a deep URL. SUBNet's location at sba.gov
+  (with the old subnet.sba.gov aliasing to it) is per the research report.
+- Template library (`/dashboard/templates`): seven real Markdown templates
+  (bid/no-bid checklist, compliance matrix, capability statement builder,
+  amendment tracking log, bid calendar worksheet, proposal outline framework,
+  past performance record sheet). Tier-gated: bidkit tier unlocks the first
+  two, growth adds three, pro adds one, allaccess adds one. Copy to clipboard
+  and .md download both work client-side; no server round trip.
+- Pricing card correction: Starter previously advertised "Written and video
+  walkthroughs." No video content exists, so the card now reads "Detailed
+  written walkthroughs with screen-level guidance." Do not re-add a video
+  claim until real videos ship.
+- Dashboard "Coming soon" states: removed for tiers with complete lessons.
+  Outlines for unowned tiers now render as "Locked" (status remains
+  "scaffolded" in outlines.ts for tiers without full lessons; update to
+  "complete" only when the lessons actually exist).
+- The Pro tier's "SAM.gov saved-search setup guidance" and the Bid Kit
+  tier's "opportunity matching based on your business profile" are now backed
+  by the real opportunities page and the Pro lessons. The "written guidance
+  through the member portal" promise is fulfilled by admin-visible business
+  profiles plus the existing bid-kit notes/delivery workflow.
+
+Still to verify on a schedule: SAM.gov search URL pattern if GSA changes
+its search routes; SUBNet deep URL if SBA publishes a stable one; set-aside
+program rules before any certification lessons are expanded.

@@ -73,6 +73,28 @@ export const bidKitRequests = pgTable(
 );
 
 /**
+ * Business profile for opportunity matching. One row per user, updated in
+ * place. Powers the tailored SAM.gov search pack on /dashboard/opportunities
+ * and is visible to admins so written guidance can reference it.
+ */
+export const opportunityProfiles = pgTable(
+  "opportunity_profiles",
+  {
+    userId: text("user_id")
+      .primaryKey()
+      .references(() => users.id),
+    companyName: text("company_name"),
+    naicsCodes: text("naics_codes"), // comma-separated, e.g. "541511, 541512"
+    certifications: text("certifications"), // comma-separated labels, e.g. "8(a), HUBZone"
+    state: text("state"), // 2-letter US state code for place-of-performance filtering
+    keywords: text("keywords"), // comma-separated search keywords describing services
+    capacityNotes: text("capacity_notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  }
+);
+
+/**
  * Stripe webhook event log. Used for idempotency (one row per event id) and
  * for reconciliation: any event stuck in 'received' or 'failed' needs review.
  */

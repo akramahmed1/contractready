@@ -146,8 +146,30 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      <h2 className="mt-12 text-2xl font-bold text-slate-900">Your lesson library</h2>
-      {library.length === 0 ? (
+      <h2 className="mt-12 text-2xl font-bold text-slate-900">Tools</h2>
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <Link
+          href="/dashboard/templates"
+          className="block rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-emerald-800 hover:shadow"
+        >
+          <p className="font-semibold text-slate-900">Template library</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Bid / no-bid checklists, compliance matrices, capability statement builder,
+            and more. Copy or download.
+          </p>
+        </Link>
+        <Link
+          href="/dashboard/opportunities"
+          className="block rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-emerald-800 hover:shadow"
+        >
+          <p className="font-semibold text-slate-900">Opportunity matching</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Build your business profile and get a tailored SAM.gov search pack.
+          </p>
+        </Link>
+      </div>
+
+      <h2 className="mt-12 text-2xl font-bold text-slate-900">Your lesson library</h2>      {library.length === 0 ? (
         <p className="mt-4 text-slate-600">
           No lessons are available yet. Check back soon, or{" "}
           <Link href="/pricing" className="font-semibold text-emerald-800 underline">

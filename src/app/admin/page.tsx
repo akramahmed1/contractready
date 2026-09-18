@@ -2,7 +2,7 @@ import { desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import type { ReactNode } from "react";
 import { getDb } from "@/lib/db";
-import { bidKitRequests, leads, purchases, stripeEvents, users } from "@/db/schema";
+import { bidKitRequests, leads, opportunityProfiles, purchases, stripeEvents, users } from "@/db/schema";
 import { getAdmin } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
@@ -97,12 +97,13 @@ export default async function AdminPage() {
   }
 
   const db = getDb();
-  const [userRows, purchaseRows, leadRows, kitRows, eventRows] = await Promise.all([
+  const [userRows, purchaseRows, leadRows, kitRows, eventRows, profileRows] = await Promise.all([
     db.select().from(users).orderBy(desc(users.createdAt)).limit(100),
     db.select().from(purchases).orderBy(desc(purchases.purchasedAt)).limit(100),
     db.select().from(leads).orderBy(desc(leads.createdAt)).limit(100),
     db.select().from(bidKitRequests).orderBy(desc(bidKitRequests.createdAt)).limit(100),
     db.select().from(stripeEvents).orderBy(desc(stripeEvents.createdAt)).limit(50),
+    db.select().from(opportunityProfiles).orderBy(desc(opportunityProfiles.updatedAt)).limit(100),
   ]);
 
   const failedEvents = eventRows.filter((e) => e.status === "failed");
@@ -320,6 +321,39 @@ export default async function AdminPage() {
                   <td className="px-4 py-2 text-slate-700">{l.consentVersion ?? "-"}</td>
                   <td className="px-4 py-2 text-slate-700">{l.unsubscribed ? "Yes" : "No"}</td>
                   <td className="px-4 py-2 text-slate-700">{l.createdAt.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
+      <Section title={`Opportunity profiles (${profileRows.length})`}>
+        <p className="mb-3 text-sm text-slate-600">
+          Business profiles customers completed for opportunity matching. Use these to
+          provide written guidance through bid kit notes or direct outreach.
+        </p>
+        <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <table className="min-w-full text-left text-sm">
+            <thead className="bg-slate-50">
+              <tr>
+                {["Company", "NAICS", "Certifications", "State", "Keywords", "Updated"].map((h) => (
+                  <th key={h} className="px-4 py-2 font-semibold text-slate-700">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {profileRows.length === 0 && <EmptyRow cols={6} text="Nothing here yet." />}
+              {profileRows.map((p, i) => (
+                <tr key={p.userId} className={i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
+                  <td className="px-4 py-2 text-slate-700">{p.companyName ?? "-"}</td>
+                  <td className="px-4 py-2 text-slate-700">{p.naicsCodes ?? "-"}</td>
+                  <td className="px-4 py-2 text-slate-700">{p.certifications ?? "-"}</td>
+                  <td className="px-4 py-2 text-slate-700">{p.state ?? "-"}</td>
+                  <td className="px-4 py-2 text-slate-700">{p.keywords ?? "-"}</td>
+                  <td className="px-4 py-2 text-slate-700">{p.updatedAt.toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>

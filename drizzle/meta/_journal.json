@@ -15,6 +15,13 @@
       "when": 1789759306250,
       "tag": "0001_common_corsair",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789761158492,
+      "tag": "0002_opportunity_profiles",
+      "breakpoints": true
     }
   ]
 }

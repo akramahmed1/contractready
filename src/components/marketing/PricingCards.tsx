@@ -7,7 +7,7 @@ import { ACK_TEXT, ACK_VERSION } from "@/lib/ack";
 const PLAN_FEATURES: Record<string, string[]> = {
   starter: [
     "Step-by-step SAM.gov registration training",
-    "Written and video walkthroughs",
+    "Detailed written walkthroughs with screen-level guidance",
     "Information and document preparation checklist",
     "Guidance on selecting relevant NAICS codes",
     "Common-error and rejection-prevention guide",
@@ -27,7 +27,7 @@ const PLAN_FEATURES: Record<string, string[]> = {
   growth: [
     "Everything in Bid Kit",
     "Up to 10 Bid Kits during the 12-month access period",
-    "More opportunity-matching capacity",
+    "Tailored opportunity search packs for your business profile",
     "Written member-portal guidance",
   ],
   pro: [

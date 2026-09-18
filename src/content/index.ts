@@ -3,9 +3,20 @@ import type { TierId } from "@/lib/tiers";
 import type { Lesson, TierOutline } from "./types";
 import { FREE_LESSONS } from "./free";
 import { STARTER_LESSONS } from "./starter";
+import { BIDKIT_LESSONS } from "./bidkit";
+import { GROWTH_LESSONS } from "./growth";
+import { PRO_LESSONS } from "./pro";
+import { ALLACCESS_LESSONS } from "./allaccess";
 import { TIER_OUTLINES } from "./outlines";
 
-export const LESSONS: Lesson[] = [...FREE_LESSONS, ...STARTER_LESSONS];
+export const LESSONS: Lesson[] = [
+  ...FREE_LESSONS,
+  ...STARTER_LESSONS,
+  ...BIDKIT_LESSONS,
+  ...GROWTH_LESSONS,
+  ...PRO_LESSONS,
+  ...ALLACCESS_LESSONS,
+];
 
 export { TIER_OUTLINES };
 

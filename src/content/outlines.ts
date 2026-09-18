@@ -1,13 +1,14 @@
 import type { TierOutline } from "./types";
 
 /**
- * Scaffolded outlines for paid tiers above Starter.
- * These describe planned curriculum structure; lesson content is written later.
+ * Curriculum outlines for paid tiers above Starter.
+ * Each outline's lessons are implemented in full in the matching content file
+ * (bidkit.ts, growth.ts, pro.ts, allaccess.ts) and wired into content/index.ts.
  */
 export const TIER_OUTLINES: TierOutline[] = [
   {
     tier: "bidkit",
-    status: "scaffolded",
+    status: "complete",
     modules: [
       {
         title: "How Bid Kits Work",
@@ -78,7 +79,7 @@ export const TIER_OUTLINES: TierOutline[] = [
   },
   {
     tier: "growth",
-    status: "scaffolded",
+    status: "complete",
     modules: [
       {
         title: "Scaling Your Bid Volume",
@@ -149,7 +150,7 @@ export const TIER_OUTLINES: TierOutline[] = [
   },
   {
     tier: "pro",
-    status: "scaffolded",
+    status: "complete",
     modules: [
       {
         title: "Your Project-Finding System",
@@ -220,7 +221,7 @@ export const TIER_OUTLINES: TierOutline[] = [
   },
   {
     tier: "allaccess",
-    status: "scaffolded",
+    status: "complete",
     modules: [
       {
         title: "Building Your Two-Year Pipeline",
