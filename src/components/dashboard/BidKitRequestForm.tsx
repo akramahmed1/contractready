@@ -5,6 +5,7 @@ import { useState } from "react";
 export default function BidKitRequestForm({ remaining }: { remaining: number }) {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
   const [left, setLeft] = useState(remaining);
@@ -17,13 +18,18 @@ export default function BidKitRequestForm({ remaining }: { remaining: number }) 
       const res = await fetch("/api/bid-kits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ solicitationTitle: title, solicitationUrl: url }),
+        body: JSON.stringify({
+          solicitationTitle: title,
+          solicitationUrl: url,
+          solicitationDueDate: dueDate || undefined,
+        }),
       });
       const data = await res.json().catch(() => null);
       if (res.ok && data && data.ok === true) {
         setStatus("done");
         setTitle("");
         setUrl("");
+        setDueDate("");
         if (data.allowance && typeof data.allowance.remaining === "number") {
           setLeft(data.allowance.remaining);
         } else {
@@ -86,6 +92,21 @@ export default function BidKitRequestForm({ remaining }: { remaining: number }) 
             placeholder="https://sam.gov/..."
             className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#0f3d2e] focus:outline-none focus:ring-1 focus:ring-[#0f3d2e]"
           />
+        </div>
+        <div>
+          <label htmlFor="bk-duedate" className="block text-sm font-semibold text-slate-900">
+            Solicitation due date <span className="font-normal text-slate-500">(optional)</span>
+          </label>
+          <input
+            id="bk-duedate"
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 focus:border-[#0f3d2e] focus:outline-none focus:ring-1 focus:ring-[#0f3d2e]"
+          />
+          <p className="mt-1 text-xs text-slate-500">
+            Tell us the closing date so we can prioritize. If it closes before your 5-business-day promised date, we flag it as a rush.
+          </p>
         </div>
         {status === "error" && (
           <p role="alert" className="text-sm text-red-700">

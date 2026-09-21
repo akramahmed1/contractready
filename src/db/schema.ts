@@ -3,6 +3,7 @@ import {
   serial,
   text,
   timestamp,
+  date,
   integer,
   boolean,
   index,
@@ -66,6 +67,9 @@ export const bidKitRequests = pgTable(
     status: text("status").notNull().default("requested"), // requested | in_progress | delivered
     adminNotes: text("admin_notes"),
     deliveryUrl: text("delivery_url"),
+    solicitationDueDate: date("solicitation_due_date"),
+    inProgressAt: timestamp("in_progress_at"),
+    revisionCount: integer("revision_count").default(0).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
     deliveredAt: timestamp("delivered_at"),

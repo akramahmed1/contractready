@@ -51,9 +51,10 @@ export async function POST(req: Request) {
     const body = (await req.json().catch(() => null)) as {
       solicitationTitle?: unknown;
       solicitationUrl?: unknown;
+      solicitationDueDate?: unknown;
     } | null;
 
-    const validated = validateBidKitInput(body?.solicitationTitle, body?.solicitationUrl);
+    const validated = validateBidKitInput(body?.solicitationTitle, body?.solicitationUrl, body?.solicitationDueDate);
     if ("error" in validated) {
       return NextResponse.json({ error: validated.error }, { status: 400 });
     }
@@ -77,16 +78,18 @@ export async function POST(req: Request) {
       userId,
       solicitationTitle: validated.title,
       solicitationUrl: validated.url,
+      solicitationDueDate: validated.dueDate,
     });
     try {
       const { sendEmail, bidKitReceivedEmail, getUserEmail } = await import("@/lib/email");
+      const { formatLongYMD, promisedByYMD } = await import("@/lib/sla");
       const email = await getUserEmail(userId);
       if (email) {
         await sendEmail({
           to: email,
           userId,
           type: "bidkit_received",
-          template: bidKitReceivedEmail(validated.title),
+          template: bidKitReceivedEmail(validated.title, formatLongYMD(promisedByYMD(new Date()))),
         });
       }
     } catch (err) {

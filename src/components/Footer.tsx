@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 
-export default function Footer() {
+export default async function Footer() {
+  const { userId } = await auth();
+  const signedIn = Boolean(userId);
   return (
     <footer className="border-t border-slate-200 bg-slate-50">
       <div className="mx-auto max-w-6xl px-4 py-10">
@@ -15,7 +18,9 @@ export default function Footer() {
               <li><Link href="/how-it-works" className="hover:text-[#0f3d2e]">How it works</Link></li>
               <li><Link href="/pricing" className="hover:text-[#0f3d2e]">Pricing</Link></li>
               <li><Link href="/free-checklist" className="hover:text-[#0f3d2e]">Free SAM.gov checklist</Link></li>
-              <li><Link href="/dashboard" className="hover:text-[#0f3d2e]">Member dashboard</Link></li>
+              {signedIn && (
+                <li><Link href="/dashboard" className="hover:text-[#0f3d2e]">Member dashboard</Link></li>
+              )}
             </ul>
           </div>
           <div>

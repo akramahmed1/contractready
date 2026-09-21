@@ -8,6 +8,7 @@ import { PAID_TIERS, TIERS } from "@/lib/tiers";
 import type { TierId } from "@/lib/tiers";
 import { getAdmin } from "@/lib/admin";
 import ReconcilePanel from "@/components/admin/ReconcilePanel";
+import { bidKitSlaStatus, formatLongYMD, type BidKitSlaStatus } from "@/lib/sla";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,7 @@ async function updateBidKitRequest(formData: FormData) {
   const status = String(formData.get("status") ?? "");
   const adminNotes = String(formData.get("adminNotes") ?? "").trim() || null;
   const deliveryUrlRaw = String(formData.get("deliveryUrl") ?? "").trim();
+  const revisionCount = Math.max(0, Math.min(99, Number(formData.get("revisionCount") ?? 0) || 0));
   if (!Number.isInteger(id) || !KIT_STATUSES.includes(status as (typeof KIT_STATUSES)[number])) {
     throw new Error("Invalid bid kit update");
   }
@@ -38,7 +40,12 @@ async function updateBidKitRequest(formData: FormData) {
 
   const db = getDb();
   const before = await db
-    .select({ userId: bidKitRequests.userId, title: bidKitRequests.solicitationTitle, status: bidKitRequests.status })
+    .select({
+      userId: bidKitRequests.userId,
+      title: bidKitRequests.solicitationTitle,
+      status: bidKitRequests.status,
+      inProgressAt: bidKitRequests.inProgressAt,
+    })
     .from(bidKitRequests)
     .where(eq(bidKitRequests.id, id))
     .limit(1);
@@ -48,8 +55,11 @@ async function updateBidKitRequest(formData: FormData) {
       status,
       adminNotes,
       deliveryUrl,
+      revisionCount,
       updatedAt: new Date(),
       deliveredAt: status === "delivered" ? new Date() : null,
+      inProgressAt:
+        status === "in_progress" && !before[0]?.inProgressAt ? new Date() : before[0]?.inProgressAt ?? null,
     })
     .where(eq(bidKitRequests.id, id));
 
@@ -227,7 +237,16 @@ export default async function AdminPage() {
     db.select().from(users).orderBy(desc(users.createdAt)).limit(100),
     db.select().from(purchases).orderBy(desc(purchases.purchasedAt)).limit(100),
     db.select().from(leads).orderBy(desc(leads.createdAt)).limit(100),
-    db.select().from(bidKitRequests).orderBy(desc(bidKitRequests.createdAt)).limit(100),
+    db
+      .select()
+      .from(bidKitRequests)
+      .orderBy(
+        // Open work first so aging requests surface: requested, then in
+        // progress, then delivered. Oldest first within each state.
+        sql`CASE ${bidKitRequests.status} WHEN 'requested' THEN 0 WHEN 'in_progress' THEN 1 ELSE 2 END`,
+        bidKitRequests.createdAt
+      )
+      .limit(100),
     db.select().from(stripeEvents).orderBy(desc(stripeEvents.createdAt)).limit(50),
     db.select().from(opportunityProfiles).orderBy(desc(opportunityProfiles.updatedAt)).limit(100),
     db
@@ -627,11 +646,23 @@ export default async function AdminPage() {
               Nothing here yet.
             </p>
           )}
-          {kitRows.map((r) => (
+          {kitRows.map((r) => {
+            const sla = bidKitSlaStatus(r.createdAt, r.deliveredAt ?? null, new Date());
+            const dueYmd = r.solicitationDueDate ?? null;
+            const rush = dueYmd !== null && dueYmd < sla.promisedBy && r.status !== "delivered";
+            const slaBadge: Record<BidKitSlaStatus, { label: string; cls: string }> = {
+              met: { label: "SLA met", cls: "bg-emerald-100 text-emerald-900" },
+              missed: { label: "Delivered late", cls: "bg-red-100 text-red-900" },
+              on_track: { label: "On track", cls: "bg-slate-100 text-slate-700" },
+              due_today: { label: "Due today", cls: "bg-amber-100 text-amber-900" },
+              overdue: { label: "Overdue", cls: "bg-red-100 text-red-900" },
+            };
+            const badge = slaBadge[sla.status];
+            return (
             <form
               key={r.id}
               action={updateBidKitRequest}
-              className="rounded-xl border border-slate-200 bg-white p-5"
+              className={`rounded-xl border bg-white p-5 ${sla.status === "overdue" || rush ? "border-red-300" : "border-slate-200"}`}
             >
               <input type="hidden" name="id" value={r.id} />
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -639,8 +670,27 @@ export default async function AdminPage() {
                   <p className="font-semibold text-slate-900">{r.solicitationTitle}</p>
                   <p className="mt-0.5 text-xs text-slate-500">
                     User {r.userId} · Requested {r.createdAt.toLocaleString()}
-                    {r.updatedAt && ` · Updated ${r.updatedAt.toLocaleString()}`}
+                    {r.inProgressAt && ` · Work started ${r.inProgressAt.toLocaleString()}`}
+                    {r.deliveredAt && ` · Delivered ${r.deliveredAt.toLocaleString()}`}
                   </p>
+                  <p className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                    <span className={`rounded-full px-2 py-0.5 font-semibold ${badge.cls}`}>
+                      {badge.label}
+                    </span>
+                    <span className="text-slate-600">
+                      Promised by {formatLongYMD(sla.promisedBy)} · {sla.businessDaysElapsed} business day{sla.businessDaysElapsed === 1 ? "" : "s"} elapsed
+                    </span>
+                  </p>
+                  {dueYmd && (
+                    <p className="mt-1 text-xs text-slate-600">
+                      Solicitation closes {formatLongYMD(dueYmd)}
+                      {rush && (
+                        <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 font-semibold text-red-900">
+                          Rush: closes before the 5-business-day promise
+                        </span>
+                      )}
+                    </p>
+                  )}
                   {r.solicitationUrl && (
                     <a
                       href={r.solicitationUrl}
@@ -652,20 +702,33 @@ export default async function AdminPage() {
                     </a>
                   )}
                 </div>
-                <label className="flex items-center gap-2 text-sm">
-                  <span className="font-semibold text-slate-700">Status</span>
-                  <select
-                    name="status"
-                    defaultValue={r.status}
-                    className="rounded border border-slate-300 px-2 py-1"
-                  >
-                    {KIT_STATUSES.map((s) => (
-                      <option key={s} value={s}>
-                        {s.replace("_", " ")}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 text-sm">
+                    <span className="font-semibold text-slate-700">Status</span>
+                    <select
+                      name="status"
+                      defaultValue={r.status}
+                      className="rounded border border-slate-300 px-2 py-1"
+                    >
+                      {KIT_STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {s.replace("_", " ")}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm" title="Revision rounds used (one is included)">
+                    <span className="font-semibold text-slate-700">Revisions</span>
+                    <input
+                      name="revisionCount"
+                      type="number"
+                      min={0}
+                      max={99}
+                      defaultValue={r.revisionCount}
+                      className="w-16 rounded border border-slate-300 px-2 py-1"
+                    />
+                  </label>
+                </div>
               </div>
               <div className="mt-3 grid gap-3 md:grid-cols-2">
                 <label className="block text-sm">
@@ -698,7 +761,8 @@ export default async function AdminPage() {
                 Save changes
               </button>
             </form>
-          ))}
+            );
+          })}
         </div>
       </Section>
 

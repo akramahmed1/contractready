@@ -80,13 +80,13 @@ export function checklistDeliveryEmail(): EmailTemplate {
   };
 }
 
-export function bidKitReceivedEmail(title: string): EmailTemplate {
+export function bidKitReceivedEmail(title: string, promisedBy: string): EmailTemplate {
   return {
     subject: "We received your bid kit request",
     html: wrap(
       "Bid kit request received",
       `<p>We received your request for a bid kit on <strong>${title}</strong>.</p>
-<p>Our team prepares every kit by hand: compliance checklist, templates, and a bid/no-bid worksheet, delivered to your dashboard within 5 business days. If the solicitation changes before its due date, you get one revision.</p>
+<p>Our team prepares every kit by hand: compliance checklist, templates, and a bid/no-bid worksheet, delivered to your dashboard by <strong>${promisedBy}</strong> (within 5 business days). If the solicitation changes before its due date, you get one revision.</p>
 <p>ContractReady does not submit bids, set pricing, or make certifications on your behalf.</p>`
     ),
   };

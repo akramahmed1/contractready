@@ -128,19 +128,38 @@ const URL_MAX = 500;
 
 /**
  * Strict validation for bid-kit request input. Returns the normalized values
- * or an error message safe to show the user.
+ * or an error message safe to show the user. The solicitation due date is
+ * optional; when present it must be a real YYYY-MM-DD calendar date.
  */
 export function validateBidKitInput(
   title: unknown,
-  url: unknown
-): { title: string; url: string | null } | { error: string } {
+  url: unknown,
+  dueDate: unknown
+): { title: string; url: string | null; dueDate: string | null } | { error: string } {
   const t = typeof title === "string" ? title.trim() : "";
   if (!t) return { error: "Please enter the solicitation title." };
   if (t.length > TITLE_MAX) {
     return { error: `Please keep the solicitation title under ${TITLE_MAX} characters.` };
   }
+  let normalizedDue: string | null = null;
+  const rawDue = typeof dueDate === "string" ? dueDate.trim() : "";
+  if (rawDue) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDue)) {
+      return { error: "That due date does not look like a real calendar date." };
+    }
+    const [y, m, d] = rawDue.split("-").map(Number);
+    const probe = new Date(Date.UTC(y, m - 1, d));
+    if (
+      probe.getUTCFullYear() !== y ||
+      probe.getUTCMonth() + 1 !== m ||
+      probe.getUTCDate() !== d
+    ) {
+      return { error: "That due date does not look like a real calendar date." };
+    }
+    normalizedDue = rawDue;
+  }
   const rawUrl = typeof url === "string" ? url.trim() : "";
-  if (!rawUrl) return { title: t, url: null };
+  if (!rawUrl) return { title: t, url: null, dueDate: normalizedDue };
   if (rawUrl.length > URL_MAX) {
     return { error: "That link is too long. Please use a shorter URL." };
   }
@@ -153,5 +172,5 @@ export function validateBidKitInput(
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
     return { error: "Links must start with http:// or https://." };
   }
-  return { title: t, url: parsed.toString() };
+  return { title: t, url: parsed.toString(), dueDate: normalizedDue };
 }

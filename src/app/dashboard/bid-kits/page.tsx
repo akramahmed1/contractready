@@ -6,6 +6,7 @@ import { bidKitRequests } from "@/db/schema";
 import { ensureUser } from "@/lib/access";
 import { getBidKitAllowance } from "@/lib/bidkits";
 import BidKitRequestForm from "@/components/dashboard/BidKitRequestForm";
+import { bidKitSlaStatus, formatLongYMD } from "@/lib/sla";
 
 export const dynamic = "force-dynamic";
 
@@ -56,8 +57,9 @@ export default async function BidKitsPage() {
       <div className="mt-4 rounded-xl bg-slate-50 p-5 ring-1 ring-slate-200">
         <h2 className="font-bold text-slate-900">How bid kits work</h2>
         <ul className="mt-2 list-disc space-y-1 pl-6 text-sm text-slate-600">
-          <li>Delivered within 5 business days of your request, through this dashboard.</li>
+          <li>Delivered within 5 business days of your request, through this dashboard. Every request shows its promised-by date below.</li>
           <li>Each kit includes a compliance checklist, document templates, and a bid/no-bid worksheet tailored to the solicitation.</li>
+          <li>Tell us the solicitation due date when you request so we can prioritize time-sensitive work. If it closes before the 5-business-day promise, we will flag it as a rush.</li>
           <li>One revision round is included if the solicitation is amended before the due date.</li>
           <li>We never submit anything for you, set your pricing, or make certifications on your behalf. You review and submit everything yourself.</li>
         </ul>
@@ -91,7 +93,10 @@ export default async function BidKitsPage() {
         <p className="mt-3 text-slate-600">No requests yet. Your requests will appear here.</p>
       ) : (
         <div className="mt-4 space-y-3">
-          {history.map((r) => (
+          {history.map((r) => {
+            const sla = bidKitSlaStatus(r.createdAt, r.deliveredAt ?? null, new Date());
+            const dueYmd = r.solicitationDueDate ?? null;
+            return (
             <div key={r.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="font-semibold text-slate-900">{r.solicitationTitle}</p>
@@ -120,8 +125,36 @@ export default async function BidKitsPage() {
                   </>
                 )}
               </p>
+              <p className="mt-2 text-xs text-slate-600">
+                {r.status === "delivered" ? (
+                  <>
+                    Promised by {formatLongYMD(sla.promisedBy)} ·{" "}
+                    {sla.status === "met" ? (
+                      <span className="font-semibold text-emerald-800">delivered within the 5-business-day promise</span>
+                    ) : (
+                      <span className="font-semibold text-red-800">delivered late</span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    Promised by <span className="font-semibold text-slate-900">{formatLongYMD(sla.promisedBy)}</span>
+                    {sla.status === "due_today" && (
+                      <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-900">Due today</span>
+                    )}
+                    {sla.status === "overdue" && (
+                      <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 font-semibold text-red-900">Overdue</span>
+                    )}
+                  </>
+                )}
+              </p>
+              {dueYmd && (
+                <p className="mt-1 text-xs text-slate-500">
+                  Solicitation closes {formatLongYMD(dueYmd)}
+                </p>
+              )}
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
