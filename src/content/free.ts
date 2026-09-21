@@ -94,10 +94,19 @@ export const FREE_LESSONS: Lesson[] = [
         type: "p",
         text: "Both are funded to help you. A legitimate counselor will never charge you for SAM.gov registration help and will never ask for a cut of future contracts.",
       },
+      { type: "h2", text: "What comes after this checklist" },
+      {
+        type: "p",
+        text: "This checklist gets you prepared. The actual registration has more screens, more judgment calls, and more ways to get bounced than one page can cover. ContractReady Starter walks you through the registration screen by screen, shows you the most common rejection reasons before you hit them, helps you choose your NAICS codes without guessing, and covers how to keep your registration alive after approval.",
+      },
+      {
+        type: "p",
+        text: "And registration is only the starting line. Once you are registered, the real question is how to find contracts worth bidding on and how to decide which ones to pursue. That is what the higher tiers are built for: tailored SAM.gov search packs matched to your business, bid and no-bid qualification, proposal templates, and the full 91-lesson library. See the pricing page for the full breakdown.",
+      },
       {
         type: "callout",
         style: "info",
-        text: "Everything in this lesson is doable for free with the official resources above. ContractReady Starter exists for business owners who want a guided, plain-language walkthrough of the whole registration process with the pitfalls flagged in advance, but nothing here requires a paid product. The free path works; it just takes more of your time.",
+        text: "Nothing here requires a paid product. The free path works; it just takes more of your time. Starter exists for business owners who want the guided walkthrough with the pitfalls flagged in advance.",
       },
     ],
   },
