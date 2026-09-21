@@ -1,4 +1,5 @@
 import type { ContentBlock } from "@/content/types";
+import ChecklistBlock from "@/components/ChecklistBlock";
 
 const CALLOUT_STYLES: Record<string, string> = {
   info: "border-blue-200 bg-blue-50 text-blue-900",
@@ -66,24 +67,7 @@ export default function LearnRenderer({ blocks }: { blocks: ContentBlock[] }) {
               </div>
             );
           case "checklist":
-            return (
-              <ul key={i} className="space-y-2">
-                {block.items.map((item, j) => (
-                  <li
-                    key={j}
-                    className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-slate-700"
-                  >
-                    <input
-                      type="checkbox"
-                      disabled
-                      className="mt-1 h-4 w-4 shrink-0 accent-green-700"
-                      aria-label={item}
-                    />
-                    <span className="leading-6">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            );
+            return <ChecklistBlock key={i} items={block.items} />;
           default:
             return null;
         }

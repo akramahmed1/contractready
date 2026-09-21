@@ -22,7 +22,6 @@ export default function Footer() {
             <p className="text-sm font-semibold text-slate-900">Support</p>
             <ul className="mt-2 space-y-1 text-sm text-slate-600">
               <li><Link href="/faq" className="hover:text-[#0f3d2e]">FAQ</Link></li>
-              <li><Link href="/dashboard" className="hover:text-[#0f3d2e]">Member portal</Link></li>
             </ul>
           </div>
           <div>

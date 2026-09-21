@@ -89,7 +89,7 @@ export default async function OpportunitiesPage() {
 
       <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-bold text-slate-900">Your business profile</h2>
-        <OpportunityProfileForm onSaved={() => window.location.reload()} />
+        <OpportunityProfileForm />
       </div>
 
       {profile && (

@@ -86,7 +86,7 @@ export default function PricingPage() {
             If you would rather not work through the process alone, choose a plan below.
           </p>
           <a
-            href="http://sam.gov/entity-information"
+            href="https://sam.gov/entity-information"
             target="_blank"
             rel="noopener noreferrer"
             className="mt-6 inline-block rounded-lg bg-[#c8a24a] px-6 py-3 text-sm font-bold text-[#0f3d2e] hover:bg-[#b8913f]"

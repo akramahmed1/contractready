@@ -20,7 +20,7 @@ const EMPTY: Profile = {
   capacityNotes: null,
 };
 
-export default function OpportunityProfileForm({ onSaved }: { onSaved: () => void }) {
+export default function OpportunityProfileForm() {
   const [form, setForm] = useState<Profile>(EMPTY);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -64,7 +64,7 @@ export default function OpportunityProfileForm({ onSaved }: { onSaved: () => voi
       const data = await res.json().catch(() => null);
       if (res.ok && data && data.ok === true) {
         setMessage("Profile saved. Your search pack is updated below.");
-        onSaved();
+        window.location.reload();
       } else {
         setError(
           (data && typeof data.error === "string" && data.error) ||

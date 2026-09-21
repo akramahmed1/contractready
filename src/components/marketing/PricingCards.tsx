@@ -100,7 +100,7 @@ export default function PricingCards() {
             <li>No personalized guidance or support</li>
           </ul>
           <a
-            href="http://sam.gov/entity-information"
+            href="https://sam.gov/entity-information"
             target="_blank"
             rel="noopener noreferrer"
             className="mt-6 rounded-lg bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#0f3d2e] ring-1 ring-[#0f3d2e] hover:bg-slate-50"
