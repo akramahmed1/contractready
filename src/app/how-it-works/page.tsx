@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { logEvent } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "How it works | ContractReady",
@@ -35,6 +36,8 @@ const stages = [
 ];
 
 export default function HowItWorksPage() {
+  // First-party page view, no cookies. Fire-and-forget.
+  logEvent("how_it_works_view", "/how-it-works", null);
   return (
     <div>
       {/* Hero */}

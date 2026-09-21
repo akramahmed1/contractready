@@ -104,10 +104,12 @@ export async function runReconciliation(daysBack = 7): Promise<ReconcileResult> 
     }));
 
   // Persist new cases; existing open cases are left untouched.
+  // .returning() only yields rows that were actually inserted, so the
+  // counter reflects real inserts even when onConflictDoNothing skips.
   let casesPersisted = 0;
   for (const m of mismatches) {
     try {
-      await db
+      const inserted = await db
         .insert(reconcileCases)
         .values({
           stripeSessionId: m.stripeSessionId,
@@ -118,8 +120,9 @@ export async function runReconciliation(daysBack = 7): Promise<ReconcileResult> 
           sessionCreatedAt: new Date(m.createdAt),
           status: "open",
         })
-        .onConflictDoNothing();
-      casesPersisted += 1;
+        .onConflictDoNothing()
+        .returning({ id: reconcileCases.id });
+      if (inserted.length > 0) casesPersisted += 1;
     } catch (err) {
       console.error("reconcile case insert failed", m.stripeSessionId, err);
     }

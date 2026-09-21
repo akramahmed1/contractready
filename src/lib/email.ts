@@ -52,6 +52,7 @@ export function purchaseConfirmationEmail(opts: {
   tierName: string;
   amount: string;
   expires: string;
+  termMonths: number;
 }): EmailTemplate {
   return {
     subject: `Your ContractReady ${opts.tierName} plan is active`,
@@ -62,7 +63,7 @@ export function purchaseConfirmationEmail(opts: {
 <li>Amount paid: ${opts.amount}</li>
 <li>Access through: ${opts.expires}</li>
 </ul>
-<p>This is a one-time purchase for 12 months of access. It does not auto-renew.</p>
+<p>This is a one-time purchase for ${opts.termMonths} months of access. It does not auto-renew.</p>
 <p><a href="${process.env.APP_URL ?? ""}/dashboard">Start learning</a></p>`
     ),
   };
@@ -72,7 +73,7 @@ export function checklistDeliveryEmail(): EmailTemplate {
   return {
     subject: "Your SAM.gov registration prep checklist",
     html: wrap(
-      "Your checklist is attached to your download",
+      "Your checklist download is ready",
       `<p>Here is the SAM.gov registration prep checklist you requested.</p>
 <p><a href="${process.env.APP_URL ?? ""}/free-checklist">Download the PDF again any time</a></p>
 <p>When you are ready for the full walkthrough, the Starter plan covers registration end to end.</p>`

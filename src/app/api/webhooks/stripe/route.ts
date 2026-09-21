@@ -125,6 +125,7 @@ export async function POST(req: Request) {
               tierName: TIERS[tier as TierId].name,
               amount: `$${(amountCents / 100).toFixed(2)}`,
               expires: expiresAt.toLocaleDateString(),
+              termMonths: TIERS[tier as TierId].termMonths,
             }),
           });
         }

@@ -83,7 +83,7 @@ export default async function OpportunitiesPage() {
       <p className="mt-1 text-slate-600">
         Complete your business profile and we build a tailored search pack: direct links
         into SAM.gov contract opportunities matched to what you do, plus subcontracting
-        leads on SBA SUBNet. Run the searches in your own browser and save the ones you
+        leads on SBA Connect (SubNet). Run the searches in your own browser and save the ones you
         like to your SAM.gov account for daily email alerts.
       </p>
       <p className="mt-3 text-sm text-slate-600">
@@ -92,7 +92,7 @@ export default async function OpportunitiesPage() {
           Open the opportunity source directory
         </Link>{" "}
         for federal solicitations, subcontracts, the contractor directory, agency
-        procurement forecasts, and all 50 state portals.
+        procurement forecasts, and state portals in all 50 states.
       </p>
 
       <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">

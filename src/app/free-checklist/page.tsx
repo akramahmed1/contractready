@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { logEvent } from "@/lib/analytics";
 import ChecklistForm from "@/components/marketing/ChecklistForm";
 
 export const metadata: Metadata = {
@@ -27,6 +28,8 @@ const covers = [
 ];
 
 export default function FreeChecklistPage() {
+  // First-party page view, no cookies. Fire-and-forget.
+  logEvent("free_checklist_view", "/free-checklist", null);
   return (
     <div>
       <section className="bg-[#0f3d2e] text-white">

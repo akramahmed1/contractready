@@ -285,8 +285,8 @@
       "state": "South Dakota",
       "portalName": "South Dakota Office of Procurement Management",
       "url": "https://boa.sd.gov/centralservices/procurementmanagement/default.aspx",
-      "verified": true,
-      "note": "Opened 2026-09-21; official Bureau of Human Resources and Administration OPM page (boa.sd.gov). Vendor bidding runs through the state electronic procurement system linked from this page."
+      "verified": false,
+      "note": "Not confirmed 2026-09-21: the state's procurement page returned only a blank Loading state in our checks, so no working primary bid board could be verified. South Dakota vendors bid through the state's login-gated electronic procurement system; confirm the current entry point with the Office of Procurement Management."
     },
     {
       "state": "Tennessee",

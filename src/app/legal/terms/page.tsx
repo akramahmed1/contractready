@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { logEvent } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "Terms of Service (Draft) | ContractReady",
@@ -7,6 +8,8 @@ export const metadata: Metadata = {
 };
 
 export default function TermsPage() {
+  // First-party page view, no cookies. Fire-and-forget.
+  logEvent("legal_view", "/legal/terms", null, { doc: "terms" });
   return (
     <div>
       <section className="mx-auto max-w-4xl px-4 py-12">

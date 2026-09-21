@@ -37,6 +37,13 @@ export const purchases = pgTable(
     purchasedAt: timestamp("purchased_at").defaultNow().notNull(),
     expiresAt: timestamp("expires_at").notNull(),
     refunded: boolean("refunded").default(false).notNull(),
+    // Access revocation without a monetary refund. Used for reconciliation
+    // recovery purchases that never had a Stripe payment intent, so no
+    // money moved. Never mark these "refunded".
+    accessRevoked: boolean("access_revoked").default(false).notNull(),
+    // Stripe refund id created by the admin refund action (Stripe-confirmed
+    // refunds only).
+    stripeRefundId: text("stripe_refund_id"),
     // Checkout acknowledgment audit: when the buyer confirmed the
     // educational-product / no-auto-renewal terms, and which text version.
     ackAt: timestamp("ack_at"),

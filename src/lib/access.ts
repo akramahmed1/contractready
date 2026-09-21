@@ -11,7 +11,7 @@ export interface ActivePurchase {
   amountCents: number;
 }
 
-/** Non-refunded, non-expired purchases for a user, earliest-expiring first. */
+/** Non-refunded, non-revoked, non-expired purchases for a user, earliest-expiring first. */
 export async function getActivePurchases(userId: string): Promise<ActivePurchase[]> {
   const db = getDb();
   const rows = await db
@@ -27,6 +27,7 @@ export async function getActivePurchases(userId: string): Promise<ActivePurchase
       and(
         eq(purchases.userId, userId),
         eq(purchases.refunded, false),
+        eq(purchases.accessRevoked, false),
         gt(purchases.expiresAt, new Date())
       )
     )
@@ -42,7 +43,7 @@ export async function getActivePurchases(userId: string): Promise<ActivePurchase
 
 /**
  * Effective tier for a user: highest tier among active (non-refunded,
- * non-expired) purchases, or "free" when there are none.
+ * non-revoked, non-expired) purchases, or "free" when there are none.
  */
 export async function getUserTier(userId: string): Promise<TierId> {
   try {

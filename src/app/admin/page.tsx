@@ -8,6 +8,7 @@ import { PAID_TIERS, TIERS } from "@/lib/tiers";
 import type { TierId } from "@/lib/tiers";
 import { getAdmin } from "@/lib/admin";
 import ReconcilePanel from "@/components/admin/ReconcilePanel";
+import AdminMoneyAction from "@/components/admin/AdminMoneyAction";
 import { bidKitSlaStatus, formatLongYMD, type BidKitSlaStatus } from "@/lib/sla";
 
 export const dynamic = "force-dynamic";
@@ -110,9 +111,13 @@ async function setUserRole(formData: FormData) {
 
 /**
  * Grants access for an open reconcile case: creates the purchase row the
- * webhook missed (12-month term from today, same as normal fulfillment),
- * then marks the case resolved. Idempotent via the purchases
+ * webhook missed (term derived from the tier's termMonths, same as normal
+ * fulfillment), then marks the case resolved. Idempotent via the purchases
  * stripe_session_id unique constraint and the case status check.
+ *
+ * Recovery purchases carry no Stripe payment intent and no checkout
+ * acknowledgment; the admin purchases table labels them "Recovery", and
+ * they can only ever be access-revoked, never "refunded".
  */
 async function grantReconcileAccess(formData: FormData) {
   "use server";
@@ -170,10 +175,14 @@ async function ignoreReconcileCase(formData: FormData) {
 
 /**
  * Issues a full Stripe refund for a purchase and marks it refunded.
- * Admin-only. Safe to re-run: already-refunded purchases are rejected, and
- * the Stripe refund call is idempotent per payment intent. When no Stripe
- * key or payment intent exists, the purchase is still marked refunded so
- * access is revoked and the record stays truthful.
+ * Admin-only. Money-back rule: a purchase is only ever marked refunded
+ * after Stripe confirms the refund. Purchases without a Stripe payment
+ * intent (reconciliation recovery rows) can never go through this path;
+ * use revokePurchaseAccess for those.
+ *
+ * Idempotent per purchase: the Stripe call carries an idempotency key, and
+ * already-refunded purchases are rejected, so a double submit cannot
+ * refund the buyer twice.
  */
 async function issueRefund(formData: FormData) {
   "use server";
@@ -187,18 +196,59 @@ async function issueRefund(formData: FormData) {
   const purchase = rows[0];
   if (!purchase) throw new Error("Purchase not found");
   if (purchase.refunded) throw new Error("Purchase is already refunded");
-
-  if (purchase.stripePaymentIntentId && process.env.STRIPE_SECRET_KEY) {
-    try {
-      const { getStripe } = await import("@/lib/stripe");
-      await getStripe().refunds.create({ payment_intent: purchase.stripePaymentIntentId });
-    } catch (err) {
-      throw new Error(
-        `Stripe refund failed: ${err instanceof Error ? err.message : "unknown error"}`
-      );
-    }
+  if (purchase.accessRevoked) throw new Error("Purchase access is already revoked");
+  if (!purchase.stripePaymentIntentId) {
+    throw new Error(
+      "No Stripe payment on record for this purchase. Use Revoke access instead; no money moved."
+    );
   }
-  await db.update(purchases).set({ refunded: true }).where(eq(purchases.id, purchaseId));
+  if (!process.env.STRIPE_SECRET_KEY) throw new Error("Stripe is not configured");
+
+  let stripeRefundId: string;
+  try {
+    const { getStripe } = await import("@/lib/stripe");
+    const refund = await getStripe().refunds.create(
+      { payment_intent: purchase.stripePaymentIntentId },
+      { idempotencyKey: `admin-refund:purchase:${purchaseId}` }
+    );
+    stripeRefundId = refund.id;
+  } catch (err) {
+    throw new Error(
+      `Stripe refund failed: ${err instanceof Error ? err.message : "unknown error"}`
+    );
+  }
+  // Stripe confirmed the refund; only now is the local record marked.
+  await db
+    .update(purchases)
+    .set({ refunded: true, stripeRefundId })
+    .where(eq(purchases.id, purchaseId));
+  revalidatePath("/admin");
+}
+
+/**
+ * Revokes access for a purchase that never had a Stripe payment intent
+ * (reconciliation recovery rows). No money moves here, so the purchase is
+ * marked access-revoked, never "refunded".
+ */
+async function revokePurchaseAccess(formData: FormData) {
+  "use server";
+  const admin = await getAdmin();
+  if (!admin) throw new Error("Not authorized");
+  const purchaseId = Number(formData.get("purchaseId"));
+  if (!Number.isInteger(purchaseId)) throw new Error("Invalid purchase");
+
+  const db = getDb();
+  const rows = await db.select().from(purchases).where(eq(purchases.id, purchaseId)).limit(1);
+  const purchase = rows[0];
+  if (!purchase) throw new Error("Purchase not found");
+  if (purchase.refunded) throw new Error("Purchase is already refunded");
+  if (purchase.accessRevoked) throw new Error("Purchase access is already revoked");
+  if (purchase.stripePaymentIntentId) {
+    throw new Error(
+      "This purchase has a Stripe payment. Use Refund so the buyer gets their money back."
+    );
+  }
+  await db.update(purchases).set({ accessRevoked: true }).where(eq(purchases.id, purchaseId));
   revalidatePath("/admin");
 }
 
@@ -588,7 +638,7 @@ export default async function AdminPage() {
           <table className="min-w-full text-left text-sm">
             <thead className="bg-slate-50">
               <tr>
-                {["User", "Tier", "Amount", "Purchased", "Expires", "Refunded", "Ack", "Action"].map((h) => (
+                {["User", "Tier", "Amount", "Purchased", "Expires", "Status", "Ack", "Action"].map((h) => (
                   <th key={h} className="px-4 py-2 font-semibold text-slate-700">
                     {h}
                   </th>
@@ -600,36 +650,47 @@ export default async function AdminPage() {
               {purchaseRows.map((p, i) => (
                 <tr key={p.id} className={i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
                   <td className="px-4 py-2 text-slate-700">{p.userId}</td>
-                  <td className="px-4 py-2 text-slate-700">{p.tier}</td>
+                  <td className="px-4 py-2 text-slate-700">
+                    {p.tier}
+                    {!p.stripePaymentIntentId && (
+                      <span
+                        className="ml-1 rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-700"
+                        title="Recovery purchase: created from a reconciliation case, no Stripe payment intent on record"
+                      >
+                        Recovery
+                      </span>
+                    )}
+                  </td>
                   <td className="px-4 py-2 text-slate-700">${(p.amountCents / 100).toFixed(2)}</td>
                   <td className="px-4 py-2 text-slate-700">{p.purchasedAt.toLocaleString()}</td>
                   <td className="px-4 py-2 text-slate-700">{p.expiresAt.toLocaleString()}</td>
-                  <td className="px-4 py-2 text-slate-700">{p.refunded ? "Yes" : "No"}</td>
+                  <td className="px-4 py-2 text-slate-700">
+                    {p.refunded ? (
+                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800">
+                        Refunded
+                      </span>
+                    ) : p.accessRevoked ? (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                        Access revoked
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
+                        Active
+                      </span>
+                    )}
+                  </td>
                   <td className="px-4 py-2 text-slate-700">
                     {p.ackVersion ? `${p.ackVersion}` : "-"}
                   </td>
                   <td className="px-4 py-2">
-                    {!p.refunded && (
-                      <form
-                        action={issueRefund}
-                        onSubmit={(e) => {
-                          if (
-                            !confirm(
-                              `Refund $${(p.amountCents / 100).toFixed(2)} to this buyer and revoke access?`
-                            )
-                          ) {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        <input type="hidden" name="purchaseId" value={p.id} />
-                        <button
-                          type="submit"
-                          className="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50"
-                        >
-                          Refund
-                        </button>
-                      </form>
+                    {!p.refunded && !p.accessRevoked && (
+                      <AdminMoneyAction
+                        purchaseId={p.id}
+                        amount={`$${(p.amountCents / 100).toFixed(2)}`}
+                        refundAction={issueRefund}
+                        revokeAction={revokePurchaseAccess}
+                        hasPaymentIntent={Boolean(p.stripePaymentIntentId)}
+                      />
                     )}
                   </td>
                 </tr>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { logEvent } from "@/lib/analytics";
 import FaqAccordion, { type FaqItem } from "@/components/marketing/FaqAccordion";
 
 export const metadata: Metadata = {
@@ -82,6 +83,8 @@ const faqItems: FaqItem[] = [
 ];
 
 export default function FaqPage() {
+  // First-party page view, no cookies. Fire-and-forget.
+  logEvent("faq_view", "/faq", null);
   return (
     <div>
       <section className="bg-[#0f3d2e] text-white">

@@ -2,8 +2,10 @@
  * Opportunities directory: curated links to official government sources.
  *
  * Verification policy: every URL below comes from an official government
- * page or document and was checked live on 2026-09-21. Agencies move
- * pages, so re-verify periodically before relying on any single link.
+ * page or document and was checked live on 2026-09-21, except South
+ * Dakota, which is marked unverified (the state's procurement page did
+ * not render in our checks). Agencies move pages, so re-verify
+ * periodically before relying on any single link.
  */
 
 export interface DirectoryLink {
@@ -91,17 +93,37 @@ export const PROCUREMENT_FORECASTS: DirectorySection = {
   title: "Procurement forecasts",
   intro:
     "Agencies publish forecasts of upcoming contract opportunities. Forecasts change often; always confirm details in the final solicitation.",
-  links: [],
+  links: [
+    {
+      label: "GSA Forecast of Contracting Opportunities",
+      url: "https://acquisitiongateway.gov/forecast",
+      hint: "Governmentwide dashboard of planned federal procurements, searchable by agency, NAICS, and place of performance. Free, no login. Listed by the U.S. Department of Transportation as the official forecast tool.",
+    },
+    {
+      label: "VA Forecast of Contracting Opportunities",
+      url: "https://www.vendorportal.ecms.va.gov/eVP/fco/FCO.aspx",
+      hint: "VA's best estimate of procurement opportunities during the fiscal year, with NAICS codes, contacts, and estimated values. Listed in VA's official DiscoverVA resource directory.",
+    },
+    {
+      label: "NASA Acquisition Forecast",
+      url: "https://www.hq.nasa.gov/office/procurement/forecast/NAF.html",
+      hint: "NASA's semi-annual forecast of expected contract opportunities at each NASA Center. Cited in NASA's own small business marketing guide (2025).",
+    },
+  ],
 };
 
 export interface StatePortal {
   state: string;
   portalName: string;
   url: string;
+  /** False when we could not confirm a working primary bid board. */
+  verified?: boolean;
+  /** Honest note shown when verified is false. */
+  note?: string;
 }
 
 export const STATE_PORTALS_INTRO =
-  "Every state runs its own procurement portal for state and local contracts. These are the official portals, verified September 2026.";
+  "Every state runs its own procurement portal for state and local contracts. 49 of the 50 portals below were checked live in September 2026. South Dakota's entry links to the state's procurement office page; we could not confirm a working primary bid board for it, so treat that entry as unverified.";
 
 export const STATE_PORTALS: StatePortal[] = [
   {
@@ -308,6 +330,8 @@ export const STATE_PORTALS: StatePortal[] = [
     state: "South Dakota",
     portalName: "South Dakota Office of Procurement Management",
     url: "https://boa.sd.gov/centralservices/procurementmanagement/default.aspx",
+    verified: false,
+    note: "Unverified September 2026: the state's procurement page did not render in our checks, so we could not confirm a working primary bid board. South Dakota vendors bid through the state's login-gated electronic procurement system; confirm the current entry point with the Office of Procurement Management.",
   },
   {
     state: "Tennessee",

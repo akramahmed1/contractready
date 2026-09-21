@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { logEvent } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "Refund Policy (Draft) | ContractReady",
@@ -8,6 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default function RefundsPage() {
+  // First-party page view, no cookies. Fire-and-forget.
+  logEvent("legal_view", "/legal/refunds", null, { doc: "refunds" });
   return (
     <div>
       <section className="mx-auto max-w-4xl px-4 py-12">

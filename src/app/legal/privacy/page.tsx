@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { logEvent } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "Privacy Policy (Draft) | ContractReady",
@@ -7,6 +8,8 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
+  // First-party page view, no cookies. Fire-and-forget.
+  logEvent("legal_view", "/legal/privacy", null, { doc: "privacy" });
   return (
     <div>
       <section className="mx-auto max-w-4xl px-4 py-12">
