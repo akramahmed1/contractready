@@ -3,10 +3,12 @@
 import { useState } from "react";
 
 export default function TemplateViewer({
+  templateId,
   title,
   filename,
   markdown,
 }: {
+  templateId: string;
   title: string;
   filename: string;
   markdown: string;
@@ -24,6 +26,13 @@ export default function TemplateViewer({
   }
 
   function handleDownload() {
+    // Record the download server-side (evidence for refund policy), then
+    // generate the file in the browser. A failed log call never blocks the download.
+    fetch("/api/templates/download", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ templateId }),
+    }).catch(() => {});
     const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

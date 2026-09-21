@@ -53,6 +53,15 @@ export default async function BidKitsPage() {
       <p className="mt-1 text-slate-600">
         Request a done-for-you bid kit for a live solicitation, and track each request below.
       </p>
+      <div className="mt-4 rounded-xl bg-slate-50 p-5 ring-1 ring-slate-200">
+        <h2 className="font-bold text-slate-900">How bid kits work</h2>
+        <ul className="mt-2 list-disc space-y-1 pl-6 text-sm text-slate-600">
+          <li>Delivered within 5 business days of your request, through this dashboard.</li>
+          <li>Each kit includes a compliance checklist, document templates, and a bid/no-bid worksheet tailored to the solicitation.</li>
+          <li>One revision round is included if the solicitation is amended before the due date.</li>
+          <li>We never submit anything for you, set your pricing, or make certifications on your behalf. You review and submit everything yourself.</li>
+        </ul>
+      </div>
 
       <div className="mt-6">
         {allowance.remaining > 0 ? (

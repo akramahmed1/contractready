@@ -18,8 +18,9 @@ export default function PrivacyPage() {
             Draft. Requires attorney review before launch.
           </p>
           <p className="mt-1 text-sm text-amber-800">
-            This document is an internal draft and is not legally binding until reviewed
-            and approved by a licensed attorney.
+            This document is an internal draft. It is not in effect, and no
+            payments are being accepted, until it has been reviewed and approved
+            by a licensed attorney.
           </p>
         </div>
 
@@ -100,8 +101,10 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-bold text-slate-900">4. Cookies</h2>
             <p className="mt-2 leading-relaxed">
               We use a small set of cookies and similar technologies: strictly necessary
-              cookies that keep you signed in and remember your preferences, and basic
-              analytics that help us understand which pages are useful. You can control
+              cookies that keep you signed in and remember your preferences. Our
+              analytics are first-party and server-side: we log which pages and
+              lessons are viewed and which key actions are taken (such as starting
+              checkout), without cookies and without third-party trackers. You can control
               cookies through your browser settings, but blocking necessary cookies may
               prevent parts of the site from working.
             </p>
@@ -145,7 +148,9 @@ export default function PrivacyPage() {
               We keep your account and purchase records for as long as your account is
               active and for a reasonable period afterward to meet legal, tax, and
               accounting obligations. Marketing email lists are deleted when you
-              unsubscribe. You may request deletion of your account data as described
+              unsubscribe. First-party analytics events (page views and actions, no
+              cookies, no third-party trackers) are kept for up to 24 months and then
+              deleted automatically. You may request deletion of your account data as described
               below, subject to records we are required to keep.
             </p>
           </section>

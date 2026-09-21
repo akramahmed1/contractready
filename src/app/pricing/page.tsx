@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { auth } from "@clerk/nextjs/server";
 import PricingCards from "@/components/marketing/PricingCards";
+import { logEvent } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "Pricing | ContractReady",
@@ -68,7 +70,10 @@ const planRules = [
   },
 ];
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const { userId } = await auth();
+  logEvent("pricing_view", "/pricing", userId);
+
   return (
     <div>
       {/* Hero */}

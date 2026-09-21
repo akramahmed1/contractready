@@ -18,6 +18,14 @@ export interface Lesson {
   estMinutes: number;
   summary: string;
   blocks: ContentBlock[];
+  /**
+   * Optional video walkthrough. When set, the lesson page renders an embedded
+   * player above the written content. Accepts a YouTube/Vimeo watch URL or a
+   * direct .mp4 URL. Lessons without a recording show a "recording in
+   * progress" placeholder instead.
+   */
+  videoUrl?: string;
+  videoLabel?: string;
 }
 
 export interface TierOutlineModule {

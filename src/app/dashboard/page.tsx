@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { ensureUser, getActivePurchases, getUserTier } from "@/lib/access";
+import { getDb } from "@/lib/db";
+import { lessonProgress } from "@/db/schema";
+import { desc, eq } from "drizzle-orm";
 import { getBidKitAllowance } from "@/lib/bidkits";
 import { PAID_TIERS, TIERS, tierUnlocks, type TierId } from "@/lib/tiers";
 import type { Lesson, TierOutline } from "@/content/types";
@@ -87,6 +90,28 @@ export default async function DashboardPage({
   const lessons = (await safeLessonsForTier(tier)).filter((l) => tierUnlocks(tier, l.tier));
   const library = groupByTier(lessons);
 
+  // Resume: most recently touched lesson that is not completed yet.
+  let resume: { slug: string; title: string; status: string } | null = null;
+  try {
+    const db = getDb();
+    const rows = await db
+      .select({ slug: lessonProgress.slug, status: lessonProgress.status })
+      .from(lessonProgress)
+      .where(eq(lessonProgress.userId, userId))
+      .orderBy(desc(lessonProgress.updatedAt))
+      .limit(20);
+    for (const r of rows) {
+      if (r.status === "completed") continue;
+      const lesson = lessons.find((l) => l.slug === r.slug);
+      if (lesson) {
+        resume = { slug: lesson.slug, title: lesson.title, status: r.status };
+        break;
+      }
+    }
+  } catch {
+    resume = null;
+  }
+
   const lockedTiers = PAID_TIERS.filter((t) => !tierUnlocks(tier, t.id));
   const lockedOutlines = await Promise.all(
     lockedTiers.map(async (t) => ({ def: t, outline: await safeOutlineForTier(t.id) }))
@@ -105,6 +130,23 @@ export default async function DashboardPage({
 
       <h1 className="text-3xl font-bold text-slate-900">Welcome back</h1>
       <p className="mt-1 text-slate-600">This is your path from zero to contract-ready.</p>
+
+      {resume ? (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-emerald-800">
+              Continue where you left off
+            </p>
+            <p className="mt-1 font-semibold text-slate-900">{resume.title}</p>
+          </div>
+          <Link
+            href={`/dashboard/learn/${resume.slug}`}
+            className="rounded-lg bg-emerald-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800"
+          >
+            Resume lesson
+          </Link>
+        </div>
+      ) : null}
 
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">

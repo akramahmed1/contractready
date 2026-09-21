@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/stripe";
 import { getDb } from "@/lib/db";
 import { purchases, stripeEvents, users } from "@/db/schema";
 import { PAID_TIERS, TIERS, type TierId } from "@/lib/tiers";
+import { logEventWait } from "@/lib/analytics";
 
 // App Router: no bodyParser config needed. We read the raw body via req.text()
 // and verify the Stripe signature ourselves.
@@ -109,6 +110,27 @@ export async function POST(req: Request) {
         .onConflictDoNothing();
 
       await markEvent(event.id, "processed");
+      await logEventWait("purchase_completed", "/api/webhooks/stripe", userId, { tier: tier ?? "unknown" });
+      // Purchase confirmation email (logged as skipped until a provider is configured).
+      try {
+        const { sendEmail, purchaseConfirmationEmail, getUserEmail } = await import("@/lib/email");
+        const email = await getUserEmail(userId);
+        if (email) {
+          const amountCents = session.amount_total ?? TIERS[tier as TierId].priceCents;
+          await sendEmail({
+            to: email,
+            userId,
+            type: "purchase_confirmation",
+            template: purchaseConfirmationEmail({
+              tierName: TIERS[tier as TierId].name,
+              amount: `$${(amountCents / 100).toFixed(2)}`,
+              expires: expiresAt.toLocaleDateString(),
+            }),
+          });
+        }
+      } catch (err) {
+        console.error("purchase confirmation email failed", err);
+      }
       return NextResponse.json({ received: true });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "fulfillment error";

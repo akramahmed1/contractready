@@ -6,6 +6,7 @@ import {
   integer,
   boolean,
   index,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable(
@@ -95,6 +96,72 @@ export const opportunityProfiles = pgTable(
 );
 
 /**
+ * Notification log: every transactional email the system attempts to send.
+ * Needed for Phase 2 email. Status: sent | skipped (no provider configured)
+ * | failed. Bodies are not stored, only the type and subject.
+ */
+export const notificationLog = pgTable(
+  "notification_log",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id"),
+    email: text("email").notNull(),
+    type: text("type").notNull(), // welcome | purchase_confirmation | checklist_delivery | bidkit_received | bidkit_status | bidkit_delivered
+    subject: text("subject").notNull(),
+    status: text("status").notNull().default("skipped"), // sent | skipped | failed
+    error: text("error"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [index("notification_log_user_idx").on(t.userId)]
+);
+
+/**
+ * Lesson progress. One row per (user, lesson): started when the
+ * lesson is first opened, completed when the user marks it done.
+ * Used for resume behavior and as refund-review evidence ("accessed more
+ * than 50% of included lessons").
+ */
+export const lessonProgress = pgTable(
+  "lesson_progress",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    slug: text("slug").notNull(),
+    status: text("status").notNull().default("started"), // started | completed
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    completedAt: timestamp("completed_at"),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.userId, t.slug] }),
+    index("lesson_progress_user_idx").on(t.userId),
+    index("lesson_progress_updated_idx").on(t.updatedAt),
+  ]
+);
+
+/** Reconciliation cases: paid Stripe sessions with no matching purchase
+ * row, persisted so they survive across sweeps and can be reviewed and
+ * resolved by an admin. Status: open | resolved | ignored. */
+export const reconcileCases = pgTable(
+  "reconcile_cases",
+  {
+    id: serial("id").primaryKey(),
+    stripeSessionId: text("stripe_session_id").notNull().unique(),
+    userId: text("user_id"),
+    email: text("email"),
+    tier: text("tier"),
+    amountCents: integer("amount_cents"),
+    sessionCreatedAt: timestamp("session_created_at"),
+    status: text("status").notNull().default("open"), // open | resolved | ignored
+    resolvedAt: timestamp("resolved_at"),
+    resolutionNote: text("resolution_note"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [index("reconcile_cases_status_idx").on(t.status)]
+);
+
+/**
  * Stripe webhook event log. Used for idempotency (one row per event id) and
  * for reconciliation: any event stuck in 'received' or 'failed' needs review.
  */
@@ -105,3 +172,25 @@ export const stripeEvents = pgTable("stripe_events", {
   error: text("error"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+/**
+ * First-party analytics events. No cookies, no third-party trackers: events
+ * are logged server-side on key actions (page views of marketing pages,
+ * lesson views, template downloads, checkout starts, purchases, bid-kit
+ * requests, checklist signups). Powers the admin analytics dashboard.
+ */
+export const analyticsEvents = pgTable(
+  "analytics_events",
+  {
+    id: serial("id").primaryKey(),
+    event: text("event").notNull(), // e.g. lesson_view, checkout_started
+    path: text("path").notNull(), // request path, e.g. /dashboard/learn/starter-...
+    userId: text("user_id"), // Clerk user id when signed in, else null
+    meta: text("meta"), // optional small JSON string, e.g. {"tier":"starter"}
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("analytics_events_event_idx").on(t.event),
+    index("analytics_events_created_at_idx").on(t.createdAt),
+  ]
+);

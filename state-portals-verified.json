@@ -1,0 +1,355 @@
+{
+  "verified_date": "2026-09-21",
+  "portals": [
+    {
+      "state": "Alabama",
+      "portalName": "Alabama Buys",
+      "url": "https://alabamabuys.gov",
+      "verified": true,
+      "note": "Opened; official State of Alabama Dept of Finance e-procurement system."
+    },
+    {
+      "state": "Alaska",
+      "portalName": "Alaska Online Public Notices",
+      "url": "https://aws.state.ak.us/OnlinePublicNotices/default.aspx?msg=0",
+      "verified": true,
+      "note": "Opened; official state public notices with Vendor Self Services link."
+    },
+    {
+      "state": "Arizona",
+      "portalName": "Arizona Procurement Portal (APP)",
+      "url": "https://app.az.gov/page.aspx/en/usr/login?ReturnUrl=%2fpage.aspx%2fen%2fbuy%2fhome",
+      "verified": true,
+      "note": "Opened; State Procurement Office e-procurement system."
+    },
+    {
+      "state": "Arkansas",
+      "portalName": "Arkansas Office of State Procurement - Current Solicitations",
+      "url": "https://www.arkansas.gov/tss/procurement/bids/index.php",
+      "verified": true,
+      "note": "Opened; official current solicitations page with live bid listings."
+    },
+    {
+      "state": "California",
+      "portalName": "Cal eProcure",
+      "url": "https://caleprocure.ca.gov/pages/SupplierRegistration-BS3/SupplierRegistration.aspx",
+      "verified": true,
+      "note": "Opened; page title confirms California eProcurement Portal (JS app, no text rendered)."
+    },
+    {
+      "state": "Colorado",
+      "portalName": "ColoradoVSS",
+      "url": "https://vss.state.co.us/home",
+      "verified": true,
+      "note": "Opened; official Colorado Vendor Self Service solicitation portal."
+    },
+    {
+      "state": "Connecticut",
+      "portalName": "CTsource Bid Board",
+      "url": "https://portal.ct.gov/DAS/CTSource/BidBoard",
+      "verified": true,
+      "note": "Opened; official CTsource Bid Board, Dept of Administrative Services."
+    },
+    {
+      "state": "Delaware",
+      "portalName": "MyMarketplace Bid Solicitation Directory",
+      "url": "https://mmp.delaware.gov/Bids/",
+      "verified": true,
+      "note": "Opened; official State of Delaware central repository for all open solicitations."
+    },
+    {
+      "state": "Florida",
+      "portalName": "MyFloridaMarketPlace",
+      "url": "https://vendor.myfloridamarketplace.com/",
+      "verified": true,
+      "note": "Opened; official State of Florida eProcurement vendor portal."
+    },
+    {
+      "state": "Georgia",
+      "portalName": "Georgia Procurement Registry",
+      "url": "http://ssl.doas.state.ga.us/PRSapp/PR_index.jsp",
+      "verified": true,
+      "note": "Opened; title confirms Georgia Procurement Registry (official site per DOAS docs); page is browser-gated in text fetch."
+    },
+    {
+      "state": "Hawaii",
+      "portalName": "HIePRO",
+      "url": "https://hiepro.ehawaii.gov/vendor.html",
+      "verified": true,
+      "note": "Opened; official State of Hawaii eProcurement vendor page."
+    },
+    {
+      "state": "Idaho",
+      "portalName": "Idaho Division of Purchasing",
+      "url": "https://purchasing.idaho.gov/information-for-vendors/",
+      "verified": true,
+      "note": "Opened; official Division of Purchasing vendor resources page."
+    },
+    {
+      "state": "Illinois",
+      "portalName": "BidBuy",
+      "url": "https://www.bidbuy.illinois.gov/bso/",
+      "verified": true,
+      "note": "Opened; official State of Illinois eProcurement system."
+    },
+    {
+      "state": "Indiana",
+      "portalName": "IDOA Procurement - Bidder Opportunities",
+      "url": "https://www.in.gov/idoa/procurement/",
+      "verified": true,
+      "note": "Opened; official IDOA Procurement home with Current Opportunities / solicitation postings."
+    },
+    {
+      "state": "Iowa",
+      "portalName": "DAS Bidding Opportunities",
+      "url": "https://bidopportunities.iowa.gov/",
+      "verified": true,
+      "note": "Opened; official Iowa Dept of Administrative Services active bid opportunities."
+    },
+    {
+      "state": "Kansas",
+      "portalName": "Kansas eSupplier",
+      "url": "https://supplier.sok.ks.gov/psc/sokfsprdsup/SUPPLIER/ERP/c/NUI_FRAMEWORK.PT_LANDINGPAGE.GBL?&",
+      "verified": true,
+      "note": "Opened; resolves to the official State of Kansas PeopleSoft supplier sign-in (cookie-gated, no text rendered). NASPO-listed supplier portal."
+    },
+    {
+      "state": "Kentucky",
+      "portalName": "eMARS Vendor Self Service (VSS)",
+      "url": "https://finance.ky.gov/eProcurement/Pages/state-agency-and-local-government-procurement.aspx",
+      "verified": true,
+      "note": "Opened; official Finance and Administration Cabinet procurement page naming eMARS Vendor Self Service (vss.ky.gov) as the official bid portal; VSS app itself did not load in this environment."
+    },
+    {
+      "state": "Louisiana",
+      "portalName": "LaGov Vendor",
+      "url": "https://lagoverpvendor.doa.louisiana.gov/irj/portal/anonymous?guest_user=self_reg",
+      "verified": true,
+      "note": "Opened; official Louisiana LaGov vendor portal (page requires full browser for iView)."
+    },
+    {
+      "state": "Maine",
+      "portalName": "Maine Vendor Self-Service (VSS)",
+      "url": "https://www.maine.gov/dafs/bbm/procurementservices/vendors",
+      "verified": true,
+      "note": "Opened; official Division of Procurement Services vendor page; all solicitations via VSS since Oct 2025."
+    },
+    {
+      "state": "Maryland",
+      "portalName": "eMMA (eMaryland Marketplace Advantage)",
+      "url": "https://emma.maryland.gov/page.aspx/en/usr/login?ReturnUrl=%2fpage.aspx%2fen%2fbuy%2fhomepage",
+      "verified": true,
+      "note": "Opened; official Maryland online procurement platform."
+    },
+    {
+      "state": "Massachusetts",
+      "portalName": "COMMBUYS",
+      "url": "https://www.commbuys.com",
+      "verified": true,
+      "note": "Opened; official e-procurement platform for the Commonwealth of Massachusetts."
+    },
+    {
+      "state": "Michigan",
+      "portalName": "SIGMA Vendor Self-Service (SIGMA VSS)",
+      "url": "https://www.michigan.gov/dtmb/procurement/contractconnect/how-to-register",
+      "verified": true,
+      "note": "Opened; official DTMB page: all state bid opportunities posted via SIGMA VSS; links to SIGMA VSS login."
+    },
+    {
+      "state": "Minnesota",
+      "portalName": "Minnesota Supplier Portal (SWIFT)",
+      "url": "https://mn.gov/admin/osp/vendors/solicitations-and-contract-opportunities/supplier-portal/index.jsp",
+      "verified": true,
+      "note": "Opened; official Office of State Procurement contract-opportunities page linking to the SWIFT Supplier Portal."
+    },
+    {
+      "state": "Mississippi",
+      "portalName": "Mississippi eProcurement (MAGIC) - Supplier / Sell",
+      "url": "https://www.ms.gov/dfa/contract_bid_search/Home/Sell",
+      "verified": true,
+      "note": "Opened; official DFA eProcurement page with supplier registration, MAGIC system info, and RFx procurement-opportunity search."
+    },
+    {
+      "state": "Missouri",
+      "portalName": "MissouriBUYS",
+      "url": "https://missouribuys.mo.gov/registration",
+      "verified": true,
+      "note": "Opened; official Missouri statewide eProcurement system vendor registration."
+    },
+    {
+      "state": "Montana",
+      "portalName": "Montana Vendor Portal",
+      "url": "https://spb.mt.gov/Vendor-Resources/Vendor-Registration-Portal",
+      "verified": true,
+      "note": "Opened; official State Purchasing Bureau page; vendor portal at vendorportal.mt.gov."
+    },
+    {
+      "state": "Nebraska",
+      "portalName": "Nebraska DAS Materiel - Bid Opportunities",
+      "url": "https://das.nebraska.gov/materiel/bid-opportunities.html",
+      "verified": true,
+      "note": "Official State Purchasing Bureau bid opportunities page (linked from verified DAS vendor page)."
+    },
+    {
+      "state": "Nevada",
+      "portalName": "NEVADAePro",
+      "url": "https://nevadaepro.com/bso/",
+      "verified": true,
+      "note": "Opened; official State of Nevada Purchasing Division e-procurement portal."
+    },
+    {
+      "state": "New Hampshire",
+      "portalName": "Statewide Bids and Proposals (NH DAS Procurement and Support Services)",
+      "url": "https://apps.das.nh.gov/bidscontracts/bids.aspx",
+      "verified": true,
+      "note": "Opened; official NH Department of Administrative Services Statewide Bids and Proposals board showing current statewide bids and RFPs. Page states it is available for archival and historical review and directs users to the new NHProcurement system; the new system page (apps.das.nh.gov/NHProcurement/Bid) would not render in the reader."
+    },
+    {
+      "state": "New Jersey",
+      "portalName": "NJSTART",
+      "url": "https://www.njstart.gov/bso/",
+      "verified": true,
+      "note": "Opened; official State of New Jersey eProcurement system."
+    },
+    {
+      "state": "New Mexico",
+      "portalName": "NM-SPD Procurement Portal (Euna/Bonfire)",
+      "url": "https://generalservicesstatenmus.bonfirehub.com/",
+      "verified": true,
+      "note": "Opened the official SPD vendor letter (generalservices.state.nm.us) naming this Euna/Bonfire portal as the NM-SPD Procurement Portal, go-live September 1, 2026; all new solicitations posted there exclusively. The portal app itself did not render in the reader."
+    },
+    {
+      "state": "New York",
+      "portalName": "NYS Contract Reporter",
+      "url": "https://www.nyscr.ny.gov/",
+      "verified": true,
+      "note": "Opened; New York State's official source of contracting opportunities."
+    },
+    {
+      "state": "North Carolina",
+      "portalName": "NC eProcurement",
+      "url": "https://eprocurement.nc.gov/",
+      "verified": true,
+      "note": "Opened; official North Carolina eProcurement portal."
+    },
+    {
+      "state": "North Dakota",
+      "portalName": "NDBuys",
+      "url": "https://www.omb.nd.gov/doing-business-state/procurement/ndbuys",
+      "verified": true,
+      "note": "Opened; official OMB page: NDBuys is the state's procurement system; links to public solicitations and supplier registration."
+    },
+    {
+      "state": "Ohio",
+      "portalName": "OhioBuys",
+      "url": "https://ohiobuys.ohio.gov",
+      "verified": true,
+      "note": "Opened; official State of Ohio OhioBuys supplier portal (OH|ID login). Official Ohio DAS training materials direct bidders to OhioBuys Public Solicitations for all state solicitations."
+    },
+    {
+      "state": "Oklahoma",
+      "portalName": "Oklahoma Supplier Portal",
+      "url": "http://vendors.ok.gov/",
+      "verified": true,
+      "note": "Opened; official Oklahoma Supplier Portal for supplier self-registration and self-management. Official OMES guides direct bidders to Public Bidding Events in this portal."
+    },
+    {
+      "state": "Oregon",
+      "portalName": "OregonBuys",
+      "url": "https://oregonbuys.gov/bso/",
+      "verified": true,
+      "note": "Opened; official State of Oregon e-procurement portal."
+    },
+    {
+      "state": "Pennsylvania",
+      "portalName": "PA eMarketplace",
+      "url": "https://www.emarketplace.state.pa.us/",
+      "verified": true,
+      "note": "Confirmed by the official PA Business One-Stop Shop page: the Department of General Services hosts PA eMarketplace as the state's contracting opportunities portal. The eMarketplace homepage itself would not render in the reader."
+    },
+    {
+      "state": "Rhode Island",
+      "portalName": "Ocean State Procures (OSP)",
+      "url": "https://ridop.ri.gov/ocean-state-procures-osp",
+      "verified": true,
+      "note": "Opened; official RI Division of Purchases page: OSP is the state's eProcurement system for vendor registration, solicitations, awards; links to Bid Board."
+    },
+    {
+      "state": "South Carolina",
+      "portalName": "SC Office of State Procurement",
+      "url": "https://www.procurement.sc.gov/",
+      "verified": true,
+      "note": "Opened; official Office of State Procurement home with Bidding Opportunities, Vendor Registration, and Submitting Offers links."
+    },
+    {
+      "state": "South Dakota",
+      "portalName": "South Dakota Office of Procurement Management",
+      "url": "https://boa.sd.gov/centralservices/procurementmanagement/default.aspx",
+      "verified": true,
+      "note": "Opened 2026-09-21; official Bureau of Human Resources and Administration OPM page (boa.sd.gov). Vendor bidding runs through the state electronic procurement system linked from this page."
+    },
+    {
+      "state": "Tennessee",
+      "portalName": "Tennessee Central Procurement Office (Edison Supplier Portal)",
+      "url": "https://www.tn.gov/generalservices/procurement.html",
+      "verified": true,
+      "note": "Opened; official CPO supplier page with Edison Supplier Portal, Invitations to Bid, and RFP Opportunities."
+    },
+    {
+      "state": "Texas",
+      "portalName": "Texas Comptroller CMBL Vendor Registration",
+      "url": "https://comptroller.texas.gov/purchasing/vendor/registration/",
+      "verified": true,
+      "note": "Opened; official Texas Comptroller Centralized Master Bidders List registration."
+    },
+    {
+      "state": "Utah",
+      "portalName": "Utah Division of Purchasing",
+      "url": "https://purchasing.utah.gov/for-vendors/",
+      "verified": true,
+      "note": "Opened; official State of Utah Division of Purchasing vendor page."
+    },
+    {
+      "state": "Vermont",
+      "portalName": "VTBuys",
+      "url": "https://vtbuys.suppliers.vermont.gov/",
+      "verified": true,
+      "note": "Opened; official VTBuys eProcurement login portal, introduced by the State of Vermont Commissioner as the state's new procurement system. VTBuys is the current primary statewide portal, superseding the older Vermont Business Registry."
+    },
+    {
+      "state": "Virginia",
+      "portalName": "eVA",
+      "url": "https://eva.virginia.gov/register-now.html",
+      "verified": true,
+      "note": "Opened; official Commonwealth of Virginia eVA procurement portal registration."
+    },
+    {
+      "state": "Washington",
+      "portalName": "Washington Electronic Business Solution (WEBS)",
+      "url": "https://des.wa.gov/do-business-state",
+      "verified": true,
+      "note": "Opened; official WA Dept of Enterprise Services page; WEBS is the state bid portal."
+    },
+    {
+      "state": "West Virginia",
+      "portalName": "West Virginia Purchasing Bulletin (wvOASIS Vendor Self-Service)",
+      "url": "https://www.state.wv.us/admin/purchase/bidinfo.html",
+      "verified": true,
+      "note": "Opened; official WV Purchasing Division bid info page: bid opportunities advertised in the WV Purchasing Bulletin at wvOASIS.gov."
+    },
+    {
+      "state": "Wisconsin",
+      "portalName": "Wisconsin VendorNet",
+      "url": "https://vendornet.wi.gov/",
+      "verified": true,
+      "note": "Opened; official State of Wisconsin Department of Administration page. Body rendered as a minimal app shell; VendorNet is DOA's official state database for bids and contracts per WI DOA procurement materials."
+    },
+    {
+      "state": "Wyoming",
+      "portalName": "Public Purchase (State of Wyoming)",
+      "url": "http://www.publicpurchase.com/gems/wyominggsd,wy/buyer/public/publicInfo",
+      "verified": true,
+      "note": "Opened; Public Purchase State of Wyoming buyer home page. Official A&I Purchasing page (ai.wyo.gov) states A&I's Procurement Section partners with Public Purchase as its online bid system."
+    }
+  ]
+}

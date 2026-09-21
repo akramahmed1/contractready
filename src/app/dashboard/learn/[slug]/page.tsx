@@ -5,6 +5,13 @@ import { getUserTier } from "@/lib/access";
 import { TIERS, tierUnlocks } from "@/lib/tiers";
 import type { Lesson } from "@/content/types";
 import LearnRenderer from "@/components/LearnRenderer";
+import LessonVideo from "@/components/LessonVideo";
+import { logEvent } from "@/lib/analytics";
+import { and, eq } from "drizzle-orm";
+import { getDb } from "@/lib/db";
+import { ensureUser } from "@/lib/access";
+import { lessonProgress } from "@/db/schema";
+import MarkCompleteButton from "@/components/dashboard/MarkCompleteButton";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +39,39 @@ export default async function LearnPage({
   const { userId } = await auth();
   const userTier = userId ? await getUserTier(userId) : "free";
   const unlocked = tierUnlocks(userTier, lesson.tier);
+
+  if (unlocked) {
+    logEvent("lesson_view", `/dashboard/learn/${slug}`, userId, {
+      tier: lesson.tier,
+    });
+  }
+
+  let progressStatus: "started" | "completed" = "started";
+  if (unlocked && userId) {
+    try {
+      const db = getDb();
+      await ensureUser(userId);
+      // Record first view as "started". onConflictDoNothing preserves an
+      // existing "completed" row, so re-reading never un-completes a lesson.
+      await db
+        .insert(lessonProgress)
+        .values({ userId, slug: lesson.slug, status: "started", updatedAt: new Date() })
+        .onConflictDoNothing();
+      const rows = await db
+        .select({ status: lessonProgress.status })
+        .from(lessonProgress)
+        .where(
+          and(
+            eq(lessonProgress.userId, userId),
+            eq(lessonProgress.slug, lesson.slug)
+          )
+        )
+        .limit(1);
+      if (rows[0]?.status === "completed") progressStatus = "completed";
+    } catch (err) {
+      console.error("lesson progress write failed", err);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
@@ -62,9 +102,15 @@ export default async function LearnPage({
           <h1 className="mt-2 text-3xl font-bold text-slate-900">{lesson.title}</h1>
           <p className="mt-2 text-sm text-slate-500">{lesson.estMinutes} min read</p>
           <p className="mt-3 text-lg text-slate-600">{lesson.summary}</p>
+          <LessonVideo
+            videoUrl={lesson.videoUrl}
+            videoLabel={lesson.videoLabel}
+            lessonTitle={lesson.title}
+          />
           <div className="mt-8">
             <LearnRenderer blocks={lesson.blocks} />
           </div>
+          {userId ? <MarkCompleteButton slug={lesson.slug} initialStatus={progressStatus} /> : null}
         </article>
       )}
     </div>

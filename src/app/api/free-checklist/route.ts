@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db";
 import { leads } from "@/db/schema";
 import { LEAD_CONSENT_VERSION } from "@/lib/consent";
 import { checkRateLimit, clientIp } from "@/lib/ratelimit";
+import { logEvent } from "@/lib/analytics";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -34,11 +35,17 @@ export async function POST(req: Request) {
     }
 
     const db = getDb();
-    await db
+    const inserted = await db
       .insert(leads)
       .values({ email, source: "free-checklist", consentVersion: LEAD_CONSENT_VERSION })
-      .onConflictDoNothing();
+      .onConflictDoNothing()
+      .returning({ id: leads.id });
 
+    logEvent("checklist_signup", "/api/free-checklist", null);
+    if (inserted.length > 0) {
+      const { sendEmail, checklistDeliveryEmail } = await import("@/lib/email");
+      await sendEmail({ to: email, type: "checklist_delivery", template: checklistDeliveryEmail() });
+    }
     return NextResponse.json({ ok: true });
   } catch (err) {
     // Never leak raw errors to the client.

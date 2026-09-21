@@ -4,6 +4,7 @@ import { getUserTier } from "@/lib/access";
 import { PAID_TIERS, TIERS, tierUnlocks } from "@/lib/tiers";
 import { TEMPLATES, getTemplate, templatesForTier } from "@/content/templates";
 import TemplateViewer from "@/components/dashboard/TemplateViewer";
+import { logEvent } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,11 @@ export default async function TemplatesPage({
 
   if (active) {
     const unlocked = tierUnlocks(tier, active.tier);
+    if (unlocked) {
+      logEvent("template_view", `/dashboard/templates?template=${active.id}`, userId, {
+        tier: active.tier,
+      });
+    }
     return (
       <div className="mx-auto max-w-4xl px-4 py-10">
         <Link href="/dashboard/templates" className="text-sm font-semibold text-emerald-800 underline">
@@ -61,7 +67,7 @@ export default async function TemplatesPage({
           </div>
         ) : (
           <div className="mt-6">
-            <TemplateViewer title={active.title} filename={active.filename} markdown={active.markdown} />
+            <TemplateViewer templateId={active.id} title={active.title} filename={active.filename} markdown={active.markdown} />
           </div>
         )}
       </div>

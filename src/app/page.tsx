@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { logEvent } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "ContractReady | From zero to contract-ready",
@@ -55,19 +56,31 @@ const tierTeasers = [
 const stats = [
   {
     value: "$793B",
-    label: "Federal contract spend, FY2025 (GAO)",
+    label: "Federal contract obligations, FY2025",
+    source: "GAO Snapshot of Government-Wide Contracting, FY2025",
+    sourceUrl:
+      "https://www.gao.gov/blog/snapshot-government-wide-contracting-fy-2025-interactive-dashboard",
   },
   {
     value: "$183.5B",
-    label: "Awarded to small businesses, FY2024 (SBA scorecard)",
+    label: "Prime contracts awarded to small businesses, FY2024",
+    source: "SBA FY2024 Small Business Procurement Scorecard",
+    sourceUrl:
+      "https://legacy.sba.gov/sites/default/files/2025-07/FY24%20Scorecard%20-%20Small%20Business%20Factsheet%20-%20v1%20-%20508.pdf",
   },
   {
     value: "$94B",
-    label: "Small-business subcontracts, FY2025 (approx., SBA scorecard)",
+    label: "Small-business subcontracts, FY2025 (approx.)",
+    source:
+      "Derived from SBA FY2025 scorecard: about $273B combined prime and subcontracts minus $179B prime",
+    sourceUrl:
+      "https://legacy.sba.gov/article/2026/06/25/sba-releases-fy25-scorecard-small-business-contracting",
   },
   {
     value: "674,000+",
-    label: "Entities registered in SAM.gov (GSA)",
+    label: "Active SAM.gov entity registrations (GSA, June 2023)",
+    source: "GSA SAM.gov by the Numbers",
+    sourceUrl: "https://www.gsa.gov/system/files/SAMgov%20by%20the%20Numbers.pdf",
   },
 ];
 
@@ -95,6 +108,8 @@ const trustItems = [
 ];
 
 export default function HomePage() {
+  // First-party page view, no cookies. Fire-and-forget.
+  logEvent("homepage_view", "/", null);
   return (
     <div>
       {/* Hero */}
@@ -270,6 +285,17 @@ export default function HomePage() {
               <div key={stat.label}>
                 <p className="text-4xl font-extrabold text-[#c8a24a]">{stat.value}</p>
                 <p className="mt-2 text-sm text-slate-200">{stat.label}</p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Source:{" "}
+                  <a
+                    href={stat.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-slate-200"
+                  >
+                    {stat.source}
+                  </a>
+                </p>
               </div>
             ))}
           </div>

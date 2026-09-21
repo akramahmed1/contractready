@@ -86,6 +86,14 @@ export default async function OpportunitiesPage() {
         leads on SBA SUBNet. Run the searches in your own browser and save the ones you
         like to your SAM.gov account for daily email alerts.
       </p>
+      <p className="mt-3 text-sm text-slate-600">
+        Prefer to browse by source?{" "}
+        <Link href="/dashboard/opportunities/directory" className="font-semibold text-emerald-800 underline">
+          Open the opportunity source directory
+        </Link>{" "}
+        for federal solicitations, subcontracts, the contractor directory, agency
+        procurement forecasts, and all 50 state portals.
+      </p>
 
       <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-bold text-slate-900">Your business profile</h2>

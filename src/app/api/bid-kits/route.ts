@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import { bidKitRequests } from "@/db/schema";
 import { getBidKitAllowance, validateBidKitInput } from "@/lib/bidkits";
 import { checkRateLimit } from "@/lib/ratelimit";
+import { logEventWait } from "@/lib/analytics";
 
 export async function GET() {
   const { userId } = await auth();
@@ -71,11 +72,26 @@ export async function POST(req: Request) {
     }
 
     const db = getDb();
+    await logEventWait("bid_kit_requested", "/api/bid-kits", userId);
     await db.insert(bidKitRequests).values({
       userId,
       solicitationTitle: validated.title,
       solicitationUrl: validated.url,
     });
+    try {
+      const { sendEmail, bidKitReceivedEmail, getUserEmail } = await import("@/lib/email");
+      const email = await getUserEmail(userId);
+      if (email) {
+        await sendEmail({
+          to: email,
+          userId,
+          type: "bidkit_received",
+          template: bidKitReceivedEmail(validated.title),
+        });
+      }
+    } catch (err) {
+      console.error("bid-kit received email failed", err);
+    }
 
     const updated = await getBidKitAllowance(userId);
     return NextResponse.json({

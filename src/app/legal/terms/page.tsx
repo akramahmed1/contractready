@@ -18,8 +18,9 @@ export default function TermsPage() {
             Draft. Requires attorney review before launch.
           </p>
           <p className="mt-1 text-sm text-amber-800">
-            This document is an internal draft and is not legally binding until reviewed
-            and approved by a licensed attorney.
+            This document is an internal draft. It is not in effect, and no
+            payments are being accepted, until it has been reviewed and approved
+            by a licensed attorney.
           </p>
         </div>
 

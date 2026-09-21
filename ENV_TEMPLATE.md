@@ -19,6 +19,9 @@ cp .env.example .env
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Same page > Publishable key (`pk_test_...`) | Yes for checkout |
 | `STRIPE_WEBHOOK_SECRET` | Stripe dashboard > Developers > Webhooks > add endpoint `https://YOUR-DOMAIN/api/webhooks/stripe` > Signing secret (`whsec_...`). For local dev, use the Stripe CLI: `stripe listen --forward-to localhost:3000/api/webhooks/stripe` | Yes for provisioning |
 | `NEXT_PUBLIC_APP_URL` | Planned production domain: `https://getcontractready.com` (not registered yet — use the Railway-provided URL until it is) | Yes on deploy |
+| `RESEND_API_KEY` | Resend dashboard > API Keys (recommended email provider) | For sending email |
+| `EMAIL_FROM` | A verified sending domain address, e.g. `hello@getcontractready.com` (domain verification requires the planned domain to be registered) | For sending email |
+| `CRON_SECRET` | Generate locally: `openssl rand -hex 32`. Paste the same value in Railway env and in the scheduler that calls `/api/admin/reconcile?cron=1` | For scheduled reconciliation |
 
 ## 3. Going live later
 

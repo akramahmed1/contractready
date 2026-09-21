@@ -4,6 +4,7 @@ import { getStripe, APP_URL } from "@/lib/stripe";
 import { PAID_TIERS, TIERS, type TierId } from "@/lib/tiers";
 import { ACK_VERSION } from "@/lib/ack";
 import { checkRateLimit } from "@/lib/ratelimit";
+import { logEventWait } from "@/lib/analytics";
 
 export async function POST(req: Request) {
   try {
@@ -64,6 +65,7 @@ export async function POST(req: Request) {
       cancel_url: `${APP_URL}/pricing`,
     });
 
+    await logEventWait("checkout_started", "/api/checkout", userId, { tier });
     return NextResponse.json({ url: session.url });
   } catch (err) {
     console.error("checkout error", err);

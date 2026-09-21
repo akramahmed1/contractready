@@ -19,8 +19,9 @@ export default function RefundsPage() {
             Draft. Requires attorney review before launch.
           </p>
           <p className="mt-1 text-sm text-amber-800">
-            This document is an internal draft and is not legally binding until reviewed
-            and approved by a licensed attorney.
+            This document is an internal draft. It is not in effect, and no
+            payments are being accepted, until it has been reviewed and approved
+            by a licensed attorney.
           </p>
         </div>
 
@@ -59,6 +60,20 @@ export default function RefundsPage() {
               <li>
                 The refund request must be received within 14 calendar days of the
                 original purchase date.
+              </li>
+              <li>
+                No refund is available once any template has been downloaded. Our
+                templates are digital products: once downloaded, they cannot be
+                returned.
+              </li>
+              <li>
+                No refund is available once you have accessed more than 50% of the
+                lessons included in your plan.
+              </li>
+              <li>
+                No refund is available once a Bid Kit request has been submitted.
+                Preparing a Bid Kit is performed service work that begins when your
+                request is received.
               </li>
               <li>
                 Each purchase is eligible for one refund. If you repurchase the same

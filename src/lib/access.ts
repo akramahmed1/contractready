@@ -55,11 +55,20 @@ export async function getUserTier(userId: string): Promise<TierId> {
   }
 }
 
-/** Ensures a users row exists for the Clerk user ID; safe to call on every login. */
+/**
+ * Ensures a users row exists for the Clerk user ID; safe to call on every login.
+ * A brand-new account also gets the welcome email (logged as skipped until an
+ * email provider is configured).
+ */
 export async function ensureUser(userId: string, email?: string): Promise<void> {
   const db = getDb();
-  await db
+  const inserted = await db
     .insert(users)
     .values({ id: userId, email: email ?? null })
-    .onConflictDoNothing();
+    .onConflictDoNothing()
+    .returning({ id: users.id });
+  if (inserted.length > 0 && email) {
+    const { sendEmail, welcomeEmail } = await import("@/lib/email");
+    await sendEmail({ to: email, userId, type: "welcome", template: welcomeEmail() });
+  }
 }
