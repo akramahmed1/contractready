@@ -12,6 +12,13 @@ export const FREE_LESSONS: Lesson[] = [
     estMinutes: 15,
     summary:
       "What SAM.gov registration actually is, what you need to gather before you start, how long it takes, and where free help lives if you get stuck.",
+    furtherWatching: [
+      {
+        title: "Entity Registration: Workspace Navigation",
+        url: "https://www.youtube.com/watch?v=QL7YzxvBP9g",
+        source: "U.S. General Services Administration",
+      },
+    ],
     blocks: [
       { type: "h2", text: "What SAM.gov is" },
       {

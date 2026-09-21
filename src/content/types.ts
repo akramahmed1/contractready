@@ -26,6 +26,19 @@ export interface Lesson {
    */
   videoUrl?: string;
   videoLabel?: string;
+  /**
+   * Optional third-party "further watching" links. These are official
+   * government videos (GSA, SBA, APEX Accelerators), always labeled with
+   * their source, and never presented as our own walkthroughs.
+   */
+  furtherWatching?: FurtherWatchingLink[];
+}
+
+export interface FurtherWatchingLink {
+  title: string;
+  url: string;
+  /** Attribution shown with the video, e.g. "U.S. General Services Administration". */
+  source: string;
 }
 
 export interface TierOutlineModule {

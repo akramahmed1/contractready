@@ -4,7 +4,7 @@ interface Props {
   lessonTitle: string;
 }
 
-function toEmbedUrl(url: string): string | null {
+export function toEmbedUrl(url: string): string | null {
   try {
     const u = new URL(url);
     const host = u.hostname.replace(/^www\./, "");

@@ -15,6 +15,13 @@ export const PRO_LESSONS: Lesson[] = [
     estMinutes: 8,
     summary:
       "Turn SAM.gov from a website you visit into a feed that comes to you: saved searches, email alerts, notice-type filters, and a free API option for when you outgrow email.",
+    furtherWatching: [
+      {
+        title: "How to Find Federal Contract Opportunities",
+        url: "https://www.youtube.com/watch?v=OpGUXGKsW8U",
+        source: "Guam APEX Accelerator (a Department of Defense-funded program)",
+      },
+    ],
     blocks: [
       {
         type: "p",

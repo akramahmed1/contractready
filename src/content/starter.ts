@@ -12,6 +12,13 @@ export const STARTER_LESSONS: Lesson[] = [
     estMinutes: 20,
     summary:
       "The complete picture of SAM.gov entity registration before you begin: what it does, what it does not do, the free path, the 10 to 12 business day timeline, the yearly renewal, the two-point registration rule, and UEI basics.",
+    furtherWatching: [
+      {
+        title: "Validating Your Entity in SAM.gov",
+        url: "https://www.youtube.com/watch?v=56NQ77JX5yo",
+        source: "U.S. General Services Administration",
+      },
+    ],
     blocks: [
       { type: "h2", text: "The one-paragraph version" },
       {

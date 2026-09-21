@@ -6,6 +6,7 @@ import { TIERS, tierUnlocks } from "@/lib/tiers";
 import type { Lesson } from "@/content/types";
 import LearnRenderer from "@/components/LearnRenderer";
 import LessonVideo from "@/components/LessonVideo";
+import FurtherWatching from "@/components/FurtherWatching";
 import { logEvent } from "@/lib/analytics";
 import { and, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
@@ -111,6 +112,7 @@ export default async function LearnPage({
             <LearnRenderer blocks={lesson.blocks} />
           </div>
           {userId ? <MarkCompleteButton slug={lesson.slug} initialStatus={progressStatus} /> : null}
+          <FurtherWatching items={lesson.furtherWatching ?? []} />
         </article>
       )}
     </div>
