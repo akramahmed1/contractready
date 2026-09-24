@@ -211,6 +211,8 @@ export const STARTER_LESSONS: Lesson[] = [
     estMinutes: 35,
     summary:
       "A step-by-step walkthrough of SAM.gov entity registration: Login.gov sign-in, entity validation, core data, assertions, representations and certifications, points of contact, and submission, with notes on what to expect at each stage.",
+    videoUrl: "/walkthroughs/video2-sam-registration.mp4",
+    videoLabel: "Video walkthrough: SAM.gov entity registration, start to finish",
     blocks: [
       { type: "h2", text: "Before you begin" },
       {

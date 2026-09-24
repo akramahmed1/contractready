@@ -14,6 +14,8 @@ export const GROWTH_LESSONS: Lesson[] = [
     estMinutes: 8,
     summary:
       "Find a sustainable bid volume by working from your real hours and per-bid effort, not from ambition. Includes a planning exercise to compute your number and a rule for revisiting it.",
+    videoUrl: "/walkthroughs/video4-bid-volume.mp4",
+    videoLabel: "Video walkthrough: choosing how many bids to place",
     blocks: [
       { type: "h2", text: "Start with capacity, not ambition" },
       {

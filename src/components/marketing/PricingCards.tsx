@@ -8,6 +8,7 @@ const PLAN_FEATURES: Record<string, string[]> = {
   starter: [
     "Step-by-step SAM.gov registration training",
     "Detailed written walkthroughs with screen-level guidance",
+    "Recorded video walkthroughs of key lessons",
     "Information and document preparation checklist",
     "Guidance on selecting relevant NAICS codes",
     "Common-error and rejection-prevention guide",

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LessonVideo from "@/components/LessonVideo";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { ensureUser, getActivePurchases, getUserTier } from "@/lib/access";
 import { getDb } from "@/lib/db";
@@ -210,6 +211,16 @@ export default async function DashboardPage({
           </p>
         </Link>
       </div>
+
+      <h2 className="mt-12 text-2xl font-bold text-slate-900">Product tour</h2>
+      <p className="mt-1 text-slate-600">
+        A short tour of your dashboard and how bid kit requests work.
+      </p>
+      <LessonVideo
+        videoUrl="/walkthroughs/video7-dashboard-tour.mp4"
+        videoLabel="Video tour: your dashboard and bid kit requests"
+        lessonTitle="Dashboard and bid kit request tour"
+      />
 
       <h2 className="mt-12 text-2xl font-bold text-slate-900">Your lesson library</h2>      {library.length === 0 ? (
         <p className="mt-4 text-slate-600">

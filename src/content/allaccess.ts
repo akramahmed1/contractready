@@ -15,6 +15,8 @@ export const ALLACCESS_LESSONS: Lesson[] = [
     estMinutes: 10,
     summary:
       "Turn your bidding activity into simple funnel arithmetic using your own numbers, so you can size your effort for the year instead of guessing.",
+    videoUrl: "/walkthroughs/video6-pipeline-math.mp4",
+    videoLabel: "Video walkthrough: pipeline math",
     blocks: [
       { type: "h2", text: "The funnel" },
       {

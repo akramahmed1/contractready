@@ -15,6 +15,8 @@ export const BIDKIT_LESSONS: Lesson[] = [
     estMinutes: 8,
     summary:
       "What a ContractReady bid kit contains, what each part is for, and how the parts fit together when you sit down to work a live opportunity.",
+    videoUrl: "/walkthroughs/video3-bidkit-anatomy.mp4",
+    videoLabel: "Video walkthrough: anatomy of a bid kit",
     blocks: [
       { type: "h2", text: "An educational package, not a done-for-you bid" },
       {

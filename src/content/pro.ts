@@ -15,6 +15,8 @@ export const PRO_LESSONS: Lesson[] = [
     estMinutes: 8,
     summary:
       "Turn SAM.gov from a website you visit into a feed that comes to you: saved searches, email alerts, notice-type filters, and a free API option for when you outgrow email.",
+    videoUrl: "/walkthroughs/video5-sam-saved-searches.mp4",
+    videoLabel: "Video walkthrough: SAM.gov searches and email alerts",
     furtherWatching: [
       {
         title: "How to Find Federal Contract Opportunities",

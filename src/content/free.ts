@@ -12,6 +12,8 @@ export const FREE_LESSONS: Lesson[] = [
     estMinutes: 15,
     summary:
       "What SAM.gov registration actually is, what you need to gather before you start, how long it takes, and where free help lives if you get stuck.",
+    videoUrl: "/walkthroughs/video1-free-sam-checklist-v2.mp4",
+    videoLabel: "Video walkthrough: the free SAM.gov preparation checklist",
     furtherWatching: [
       {
         title: "Entity Registration: Workspace Navigation",
