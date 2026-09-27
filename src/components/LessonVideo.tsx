@@ -50,30 +50,39 @@ export default function LessonVideo({ videoUrl, videoLabel, lessonTitle }: Props
     );
   }
 
+  const isFile = /\.(mp4|webm)(\?|$)/i.test(videoUrl);
+  if (isFile) {
+    return (
+      <div className="mt-6">
+        <h2 className="text-lg font-bold text-slate-900">
+          {videoLabel ?? "Video walkthrough"}
+        </h2>
+        <div className="mt-3 overflow-hidden rounded-2xl bg-black ring-1 ring-slate-200">
+          <video controls preload="metadata" className="aspect-video w-full" title={lessonTitle}>
+            <source src={videoUrl} />
+            Your browser does not support embedded video.
+          </video>
+        </div>
+      </div>
+    );
+  }
+
   const embed = toEmbedUrl(videoUrl);
   if (!embed) return null;
 
-  const isFile = /\.(mp4|webm)(\?|$)/i.test(videoUrl);
   return (
     <div className="mt-6">
       <h2 className="text-lg font-bold text-slate-900">
         {videoLabel ?? "Video walkthrough"}
       </h2>
       <div className="mt-3 overflow-hidden rounded-2xl bg-black ring-1 ring-slate-200">
-        {isFile ? (
-          <video controls preload="metadata" className="aspect-video w-full" title={lessonTitle}>
-            <source src={videoUrl} />
-            Your browser does not support embedded video.
-          </video>
-        ) : (
-          <iframe
-            src={embed}
-            title={videoLabel ?? `Video walkthrough: ${lessonTitle}`}
-            className="aspect-video w-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        )}
+        <iframe
+          src={embed}
+          title={videoLabel ?? `Video walkthrough: ${lessonTitle}`}
+          className="aspect-video w-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
       </div>
     </div>
   );
