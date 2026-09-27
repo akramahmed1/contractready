@@ -151,6 +151,27 @@ export const lessonProgress = pgTable(
   ]
 );
 
+/**
+ * Readiness self-assessment. One row per user, updated in place.
+ * Powers the Contract Readiness Score on the dashboard: the member's
+ * self-reported SAM.gov status, business foundations, and bidding toolkit,
+ * combined with real lesson progress and activity data.
+ */
+export const readinessAssessments = pgTable("readiness_assessments", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id),
+  samStatus: text("sam_status").notNull().default("not_started"), // not_started | gathering_docs | submitted | active
+  hasUei: boolean("has_uei").default(false).notNull(),
+  hasEntity: boolean("has_entity").default(false).notNull(),
+  hasNaics: boolean("has_naics").default(false).notNull(),
+  hasSamLogin: boolean("has_sam_login").default(false).notNull(),
+  hasCapabilityStatement: boolean("has_capability_statement").default(false).notNull(),
+  hasPastPerformance: boolean("has_past_performance").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 /** Reconciliation cases: paid Stripe sessions with no matching purchase
  * row, persisted so they survive across sweeps and can be reviewed and
  * resolved by an admin. Status: open | resolved | ignored. */

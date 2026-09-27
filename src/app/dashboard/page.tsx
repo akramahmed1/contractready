@@ -3,10 +3,17 @@ import LessonVideo from "@/components/LessonVideo";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { ensureUser, getActivePurchases, getUserTier } from "@/lib/access";
 import { getDb } from "@/lib/db";
-import { lessonProgress } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import {
+  analyticsEvents,
+  bidKitRequests,
+  lessonProgress,
+  opportunityProfiles,
+  readinessAssessments,
+} from "@/db/schema";
+import { desc, eq, and } from "drizzle-orm";
 import { getBidKitAllowance } from "@/lib/bidkits";
 import { PAID_TIERS, TIERS, tierUnlocks, type TierId } from "@/lib/tiers";
+import { computeReadiness, type ReadinessAssessment } from "@/lib/readiness";
 import type { Lesson, TierOutline } from "@/content/types";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +52,33 @@ function groupByTier(lessons: Lesson[]) {
     groups.set(lesson.tier, arr);
   }
   return [...groups.entries()].sort((a, b) => TIERS[a[0]].rank - TIERS[b[0]].rank);
+}
+
+function ReadinessRing({ score }: { score: number }) {
+  const r = 52;
+  const c = 2 * Math.PI * r;
+  const filled = (score / 100) * c;
+  return (
+    <div className="relative h-32 w-32 shrink-0">
+      <svg viewBox="0 0 120 120" className="h-32 w-32 -rotate-90">
+        <circle cx="60" cy="60" r={r} fill="none" stroke="#e2e8f0" strokeWidth="12" />
+        <circle
+          cx="60"
+          cy="60"
+          r={r}
+          fill="none"
+          stroke="#065f46"
+          strokeWidth="12"
+          strokeLinecap="round"
+          strokeDasharray={`${filled} ${c}`}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-3xl font-extrabold text-slate-900">{score}%</span>
+        <span className="text-xs font-medium text-slate-500">ready</span>
+      </div>
+    </div>
+  );
 }
 
 export default async function DashboardPage({
@@ -91,6 +125,82 @@ export default async function DashboardPage({
   const lessons = (await safeLessonsForTier(tier)).filter((l) => tierUnlocks(tier, l.tier));
   const library = groupByTier(lessons);
 
+  // Progress + activity data for the readiness score. Each query fails soft so
+  // a missing table never breaks the dashboard.
+  let completedSlugs = new Set<string>();
+  let assessment: ReadinessAssessment | null = null;
+  let templatesDownloaded = false;
+  let hasOpportunityProfile = false;
+  let bidKitRequestCount = 0;
+  try {
+    const db = getDb();
+    const progressRows = await db
+      .select({ slug: lessonProgress.slug, status: lessonProgress.status })
+      .from(lessonProgress)
+      .where(eq(lessonProgress.userId, userId));
+    for (const row of progressRows) {
+      if (row.status === "completed") completedSlugs.add(row.slug);
+    }
+    const aRows = await db
+      .select()
+      .from(readinessAssessments)
+      .where(eq(readinessAssessments.userId, userId));
+    const a = aRows[0];
+    if (a) {
+      assessment = {
+        samStatus: (["not_started", "gathering_docs", "submitted", "active"].includes(a.samStatus)
+          ? a.samStatus
+          : "not_started") as ReadinessAssessment["samStatus"],
+        hasUei: a.hasUei,
+        hasEntity: a.hasEntity,
+        hasNaics: a.hasNaics,
+        hasSamLogin: a.hasSamLogin,
+        hasCapabilityStatement: a.hasCapabilityStatement,
+        hasPastPerformance: a.hasPastPerformance,
+      };
+    }
+    const dlRows = await db
+      .select({ id: analyticsEvents.id })
+      .from(analyticsEvents)
+      .where(
+        and(
+          eq(analyticsEvents.userId, userId),
+          eq(analyticsEvents.event, "template_download")
+        )
+      )
+      .limit(1);
+    templatesDownloaded = dlRows.length > 0;
+    const pRows = await db
+      .select({ userId: opportunityProfiles.userId })
+      .from(opportunityProfiles)
+      .where(eq(opportunityProfiles.userId, userId))
+      .limit(1);
+    hasOpportunityProfile = pRows.length > 0;
+    const kRows = await db
+      .select({ id: bidKitRequests.id })
+      .from(bidKitRequests)
+      .where(eq(bidKitRequests.userId, userId))
+      .limit(50);
+    bidKitRequestCount = kRows.length;
+  } catch {
+    // keep defaults
+  }
+
+  // Next lesson in curriculum order (first unlocked lesson not completed).
+  const nextLesson = lessons.find((l) => !completedSlugs.has(l.slug)) ?? null;
+
+  const readiness = computeReadiness({
+    assessment,
+    lessonsCompleted: completedSlugs.size,
+    lessonsUnlocked: lessons.length,
+    templatesDownloaded,
+    hasOpportunityProfile,
+    bidKitRequests: bidKitRequestCount,
+    bidKitAllowance: kitsTotal,
+    nextLesson: nextLesson ? { slug: nextLesson.slug, title: nextLesson.title } : null,
+  });
+  const nextAction = readiness.nextAction;
+
   // Resume: most recently touched lesson that is not completed yet.
   let resume: { slug: string; title: string; status: string } | null = null;
   try {
@@ -132,10 +242,69 @@ export default async function DashboardPage({
       <h1 className="text-3xl font-bold text-slate-900">Welcome back</h1>
       <p className="mt-1 text-slate-600">This is your path from zero to contract-ready.</p>
 
+      <div className="mt-6 grid gap-4 lg:grid-cols-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-3">
+          <div className="flex flex-wrap items-center gap-5">
+            <ReadinessRing score={readiness.score} />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                Contract Readiness Score
+              </p>
+              <p className="mt-1 text-sm text-slate-600">
+                {readiness.needsAssessment
+                  ? "Take the 2-minute assessment to make this score yours. Until then it reflects your lesson progress and activity only."
+                  : "Based on your assessment, lesson progress, and activity."}
+              </p>
+              <p className="mt-2 text-xs text-slate-500">
+                This measures preparation steps you have completed. It is not a
+                prediction of winning contracts, and no score guarantees results.
+              </p>
+              <Link
+                href="/dashboard/readiness"
+                className="mt-3 inline-block rounded-lg border border-emerald-900 px-4 py-2 text-sm font-semibold text-emerald-900"
+              >
+                {readiness.needsAssessment ? "Take the assessment" : "Update my assessment"}
+              </Link>
+            </div>
+          </div>
+          <div className="mt-6 space-y-3">
+            {readiness.factors.map((f) => (
+              <div key={f.key}>
+                <div className="flex items-baseline justify-between text-sm">
+                  <span className="font-semibold text-slate-800">{f.label}</span>
+                  <span className="text-slate-500">{Math.round(f.score)}%</span>
+                </div>
+                <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-emerald-800"
+                    style={{ width: `${Math.round(f.score)}%` }}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-slate-500">{f.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm lg:col-span-2">
+          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-800">
+            Your next step
+          </p>
+          <p className="mt-2 text-xl font-bold text-slate-900">{nextAction.title}</p>
+          <p className="mt-2 text-sm text-slate-700">{nextAction.description}</p>
+          <Link
+            href={nextAction.href}
+            className="mt-4 inline-block rounded-lg bg-emerald-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800"
+          >
+            {nextAction.cta}
+          </Link>
+        </div>
+      </div>
+
       {resume ? (
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-emerald-800">
+            <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
               Continue where you left off
             </p>
             <p className="mt-1 font-semibold text-slate-900">{resume.title}</p>
@@ -189,6 +358,55 @@ export default async function DashboardPage({
         </div>
       </div>
 
+      <h2 className="mt-12 text-2xl font-bold text-slate-900">Your lesson library</h2>
+      <p className="mt-1 text-slate-600">
+        {completedSlugs.size} of {lessons.length} lessons completed.
+      </p>
+      {library.length === 0 ? (
+        <p className="mt-4 text-slate-600">
+          No lessons are available yet. Check back soon, or{" "}
+          <Link href="/pricing" className="font-semibold text-emerald-800 underline">
+            upgrade your plan
+          </Link>{" "}
+          to unlock the full library.
+        </p>
+      ) : (
+        library.map(([lessonTier, tierLessons]) => {
+          const done = tierLessons.filter((l) => completedSlugs.has(l.slug)).length;
+          const pct = tierLessons.length > 0 ? Math.round((done / tierLessons.length) * 100) : 0;
+          return (
+            <div key={lessonTier} className="mt-6">
+              <div className="flex items-baseline justify-between">
+                <h3 className="text-lg font-semibold text-slate-800">{TIERS[lessonTier].name}</h3>
+                <span className="text-sm text-slate-500">
+                  {done} of {tierLessons.length} done
+                </span>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-full rounded-full bg-emerald-800" style={{ width: `${pct}%` }} />
+              </div>
+              <ul className="mt-3 grid gap-3 md:grid-cols-2">
+                {tierLessons.map((lesson) => (
+                  <li key={lesson.slug}>
+                    <Link
+                      href={`/dashboard/learn/${lesson.slug}`}
+                      className="block rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-emerald-800 hover:shadow"
+                    >
+                      <p className="font-semibold text-slate-900">
+                        {completedSlugs.has(lesson.slug) ? "✓ " : ""}
+                        {lesson.title}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-600">{lesson.summary}</p>
+                      <p className="mt-2 text-xs text-slate-500">{lesson.estMinutes} min read</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })
+      )}
+
       <h2 className="mt-12 text-2xl font-bold text-slate-900">Tools</h2>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <Link
@@ -221,36 +439,6 @@ export default async function DashboardPage({
         videoLabel="Video tour: your dashboard and bid kit requests"
         lessonTitle="Dashboard and bid kit request tour"
       />
-
-      <h2 className="mt-12 text-2xl font-bold text-slate-900">Your lesson library</h2>      {library.length === 0 ? (
-        <p className="mt-4 text-slate-600">
-          No lessons are available yet. Check back soon, or{" "}
-          <Link href="/pricing" className="font-semibold text-emerald-800 underline">
-            upgrade your plan
-          </Link>{" "}
-          to unlock the full library.
-        </p>
-      ) : (
-        library.map(([lessonTier, lessons]) => (
-          <div key={lessonTier} className="mt-6">
-            <h3 className="text-lg font-semibold text-slate-800">{TIERS[lessonTier].name}</h3>
-            <ul className="mt-3 grid gap-3 md:grid-cols-2">
-              {lessons.map((lesson) => (
-                <li key={lesson.slug}>
-                  <Link
-                    href={`/dashboard/learn/${lesson.slug}`}
-                    className="block rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-emerald-800 hover:shadow"
-                  >
-                    <p className="font-semibold text-slate-900">{lesson.title}</p>
-                    <p className="mt-1 text-sm text-slate-600">{lesson.summary}</p>
-                    <p className="mt-2 text-xs text-slate-500">{lesson.estMinutes} min read</p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
-      )}
 
       {lockedOutlines.length > 0 && (
         <>
