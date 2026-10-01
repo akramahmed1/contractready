@@ -71,6 +71,7 @@ async function main() {
   }
 
   // 3. search_opportunities: "find open federal IT services contracts for small businesses in Texas"
+  //    (honest answer today: seed items matching that filter have expired, expect 0)
   {
     const r = await rpc("tools/call", {
       name: "search_opportunities",
@@ -79,13 +80,24 @@ async function main() {
     const sc = r.body?.result?.structuredContent;
     const opps = sc?.opportunities || [];
     const okShape = Array.isArray(opps) && typeof sc?.disclaimer === "string" && sc.disclaimer.includes(EXPECTED_DISCLAIMER);
-    verdict("search_opportunities returns shaped results with disclaimer", okShape,
-      `count=${opps.length} source=${sc?.data_source}`);
-    for (const o of opps.slice(0, 3)) {
+    verdict("search_opportunities (spec example) returns shaped results with disclaimer", okShape,
+      `count=${opps.length} source=${sc?.data_source} (0 is correct: matching seed items expired by 2026-10-01)`);
+  }
+
+  // 3b. unfiltered search must return open items, every one with an official detail_url
+  {
+    const r = await rpc("tools/call", {
+      name: "search_opportunities",
+      arguments: { limit: 10 },
+    }, 30);
+    const sc = r.body?.result?.structuredContent;
+    const opps = sc?.opportunities || [];
+    const hasLink = opps.length > 0 && opps.every((o) => typeof o.detail_url === "string" && o.detail_url.startsWith("http"));
+    verdict("search_opportunities (open items) returns results, all with official detail_url", hasLink,
+      `count=${opps.length}`);
+    for (const o of opps.slice(0, 5)) {
       console.log(`      - ${o.title} | ${o.agency} | due ${o.response_deadline} | ${o.detail_url}`);
     }
-    const hasLink = opps.every((o) => typeof o.detail_url === "string" && o.detail_url.startsWith("http"));
-    verdict("every search result carries an official detail_url", opps.length > 0 && hasLink);
     if (opps.length) firstNoticeId = opps[0].notice_id;
   }
 
