@@ -40,11 +40,25 @@ export function checkRateLimit(key: string, maxRequests: number, windowMs: numbe
   return true;
 }
 
-/** Best-effort client IP from proxy headers. Never trust it for auth. */
+/**
+ * Best-effort client IP for rate-limit buckets. Never trust it for auth.
+ *
+ * Railway's edge rotates the value it writes into X-Forwarded-For on every
+ * request, so keying on the leftmost XFF entry hands each request a fresh
+ * bucket and a per-IP cap never triggers. Railway populates X-Real-IP with
+ * the true client IP instead, so prefer it; fall back to the rightmost XFF
+ * entry (the hop appended by the closest trusted proxy), then "unknown".
+ */
 export function clientIp(req: Request): string {
-  const forwarded = req.headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim();
   const real = req.headers.get("x-real-ip");
-  if (real) return real.trim();
+  if (real && real.trim()) return real.trim();
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const parts = forwarded
+      .split(",")
+      .map((p) => p.trim())
+      .filter(Boolean);
+    if (parts.length > 0) return parts[parts.length - 1];
+  }
   return "unknown";
 }
