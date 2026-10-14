@@ -34,7 +34,4 @@ jobs:
       - name: Production build
         run: npm run build
       - name: Dependency audit (critical)
-        # Expected to fail until next is bumped to >= 15.5.27 (Dependabot opens
-        # that PR). Remove continue-on-error once it is merged.
-        continue-on-error: true
         run: npm audit --omit=dev --audit-level=critical
