@@ -108,7 +108,11 @@ function holidaysFor(ymd: string): Set<string> {
 export function isBusinessDayYMD(ymd: string): boolean {
   const dow = weekdayOfYMD(ymd);
   if (dow === 0 || dow === 6) return false;
-  return !holidaysFor(ymd).has(ymd);
+  if (holidaysFor(ymd).has(ymd)) return false;
+  // A Saturday New Year's Day is observed on Friday Dec 31 of the previous
+  // year, so that date lives in next year's holiday set.
+  const { y } = parseYMD(ymd);
+  return !holidaysFor(formatYMD(y + 1, 1, 1)).has(ymd);
 }
 
 /** Next business day on or after the given date. */
@@ -172,7 +176,10 @@ export function bidKitSlaStatus(
   const businessDaysElapsed = businessDaysBetweenYMD(toChicagoYMD(createdAt), endYmd);
   let status: BidKitSlaStatus;
   if (deliveredAt) {
-    status = businessDaysElapsed <= turnaroundBusinessDays ? "met" : "missed";
+    // Compare against the promised date itself: a request created on a weekend
+    // or holiday starts its clock on the next business day, so counting
+    // elapsed business days from the creation date would overcount by one.
+    status = endYmd <= promisedBy ? "met" : "missed";
   } else if (today > promisedBy) {
     status = "overdue";
   } else if (today === promisedBy) {
