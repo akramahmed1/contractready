@@ -13,7 +13,7 @@
     "@types/node": "^20.17.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "drizzle-kit": "^0.30.4",
+    "drizzle-kit": "^0.31.11",
     "pdfkit": "^0.17.1",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.8.2"
