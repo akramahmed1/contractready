@@ -127,9 +127,12 @@ export function computeReadiness(inputs: ReadinessInputs): ReadinessResult {
   };
 
   // Learning: share of unlocked lessons completed, from real progress data.
+  // Completed can exceed unlocked when access shrinks after a refund or
+  // downgrade but old progress rows remain, so cap it at the unlocked count.
+  const lessonsCompletedCapped = Math.min(inputs.lessonsCompleted, inputs.lessonsUnlocked);
   const learningPct =
     inputs.lessonsUnlocked > 0
-      ? (inputs.lessonsCompleted / inputs.lessonsUnlocked) * 100
+      ? (lessonsCompletedCapped / inputs.lessonsUnlocked) * 100
       : 0;
   const learning: FactorScore = {
     key: "learning",
@@ -138,7 +141,7 @@ export function computeReadiness(inputs: ReadinessInputs): ReadinessResult {
     weight: 0.2,
     detail:
       inputs.lessonsUnlocked > 0
-        ? `${inputs.lessonsCompleted} of ${inputs.lessonsUnlocked} unlocked lessons completed.`
+        ? `${lessonsCompletedCapped} of ${inputs.lessonsUnlocked} unlocked lessons completed.`
         : "No lessons unlocked yet.",
   };
 
