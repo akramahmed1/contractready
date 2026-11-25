@@ -2,8 +2,8 @@
   "dependencies": {
     "@clerk/nextjs": "^6.12.0",
     "@neondatabase/serverless": "^0.10.4",
-    "drizzle-orm": "^0.39.3",
-    "next": "^15.5.27",
+    "drizzle-orm": "^0.45.4",
+    "next": "^15.5.29",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "stripe": "^17.7.0"
@@ -13,7 +13,7 @@
     "@types/node": "^20.17.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "drizzle-kit": "^0.30.4",
+    "drizzle-kit": "^0.31.11",
     "pdfkit": "^0.17.1",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.8.2"
@@ -33,5 +33,15 @@
   "version": "0.1.0",
   "engines": {
     "node": ">=22.6"
+  },
+  "overrides": {
+    "qs": "6.16.2",
+    "source-map-js": "1.2.4",
+    "next": {
+      "postcss": "8.5.28"
+    },
+    "@esbuild-kit/core-utils": {
+      "esbuild": "0.25.12"
+    }
   }
 }
